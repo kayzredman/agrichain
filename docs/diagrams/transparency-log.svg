@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="446" viewBox="0 0 920 446" role="img">
+  <style>
+    .title { font: 600 15px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .sub { font: 400 12px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .chip { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #2D6A4F; }
+    .head { font: 600 13px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .small { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #1F2937; }
+    .muted { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .on { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .later { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+  </style>
+  <rect width="920" height="446" fill="#ffffff"/>
+  <text class="head" x="19" y="30">Every event becomes one leaf, in the order it was stored</text>
+  <rect x="19" y="44" width="158" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="31" y="64">leaf 0</text>
+  <text class="small" x="31" y="84">harvest · H-1041</text>
+  <rect x="191" y="44" width="158" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="203" y="64">leaf 1</text>
+  <text class="small" x="203" y="84">merge · M-220</text>
+  <rect x="363" y="44" width="158" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="375" y="64">leaf 2</text>
+  <text class="small" x="375" y="84">accept · M-220</text>
+  <rect x="535" y="44" width="158" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="547" y="64">leaf 3</text>
+  <text class="small" x="547" y="84">process · K-220A</text>
+  <rect x="707" y="44" width="158" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="719" y="64">leaf 4</text>
+  <text class="small" x="719" y="84">pack · K-220A</text>
+  <line x1="98" y1="102" x2="98" y2="126" stroke="#143228" stroke-width="1.25"/>
+  <line x1="270" y1="102" x2="270" y2="126" stroke="#143228" stroke-width="1.25"/>
+  <line x1="442" y1="102" x2="442" y2="126" stroke="#143228" stroke-width="1.25"/>
+  <line x1="614" y1="102" x2="614" y2="126" stroke="#143228" stroke-width="1.25"/>
+  <line x1="786" y1="102" x2="786" y2="126" stroke="#143228" stroke-width="1.25"/>
+  <line x1="98" y1="126" x2="786" y2="126" stroke="#143228" stroke-width="1.25"/>
+  <line x1="237" y1="126" x2="237" y2="156" stroke="#143228" stroke-width="1.25"/>
+  <polygon points="233,156 241,156 237,162" fill="#143228"/>
+  <rect x="19" y="162" width="436" height="76" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="35" y="187">Merkle tree</text>
+  <text class="sub" x="35" y="207">Leaves hashed in pairs, up to one root.</text>
+  <text class="sub" x="35" y="225">Append only. Nothing is removed or reordered.</text>
+  <rect x="483" y="162" width="418" height="76" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="499" y="187">Signed tree head</text>
+  <text class="sub" x="499" y="207">Tree size, root hash, timestamp.</text>
+  <text class="sub" x="499" y="225">Signed by the operator.</text>
+  <line x1="455" y1="200" x2="477" y2="200" stroke="#143228" stroke-width="1.25"/>
+  <polygon points="477,196 477,204 483,200" fill="#143228"/>
+  <rect x="19" y="316" width="208" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="31" y="341">Coop</text>
+  <text class="sub" x="31" y="360">counter-signs the head</text>
+  <rect x="241" y="316" width="208" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="253" y="341">Plant</text>
+  <text class="sub" x="253" y="360">counter-signs the head</text>
+  <rect x="463" y="316" width="208" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="475" y="341">Buyer</text>
+  <text class="sub" x="475" y="360">counter-signs the head</text>
+  <rect x="685" y="316" width="208" height="58" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="697" y="341">Origin authority</text>
+  <text class="sub" x="697" y="360">counter-signs the head</text>
+  <line x1="123" y1="316" x2="123" y2="278" stroke="#143228" stroke-width="1.25"/>
+  <line x1="345" y1="316" x2="345" y2="278" stroke="#143228" stroke-width="1.25"/>
+  <line x1="567" y1="316" x2="567" y2="278" stroke="#143228" stroke-width="1.25"/>
+  <line x1="789" y1="316" x2="789" y2="278" stroke="#143228" stroke-width="1.25"/>
+  <line x1="123" y1="278" x2="789" y2="278" stroke="#143228" stroke-width="1.25"/>
+  <line x1="692" y1="278" x2="692" y2="244" stroke="#143228" stroke-width="1.25"/>
+  <polygon points="688,244 696,244 692,238" fill="#143228"/>
+  <text class="small" x="19" y="404">To change anything an endorsed head covers, the operator must publish two histories for the same tree size.</text>
+  <text class="muted" x="19" y="424">Any two of these organizations see that the moment they compare heads. No consensus network, no token.</text>
+</svg>

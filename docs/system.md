@@ -37,6 +37,16 @@ Stored, with an alert. A parcel that certifies more harvest in a season than its
 
 Two invariants belong to modules that are off for the cashew pilot, and are listed here as product rules rather than MVP behaviour: the ceiling drops when fertilizer or seed attestations are missing (Inputs), and a ship event that skips a declared port, or adds one, opens an alert rather than rewriting the route (Voyage).
 
+## What makes it a ledger
+
+Two properties, and the episode asks for both: a record that was not rewritten, and a record that no single firm controls.
+
+The first comes from signatures and hash chains. Every event is signed by the organization that witnessed it, each lot carries a chain, and a merge commits to the head hash of every input.
+
+The second comes from a transparency log over all events: a Merkle tree, a tree head the operator signs, and counter-signatures on that head from the coop, the plant, the buyer, and the authority. Any party can demand proof that its own events are in the tree and that the tree has only been appended to. The operator cannot change an endorsed history without publishing two of them, which the counterparties see.
+
+There is no token, no coin, and no consensus network. A permissioned chain is the move when a second operator will not accept this database, not before. The decision and what was rejected are in [ledger.md](ledger.md).
+
 ## Kernel and configuration
 
 The records, the signed event envelope, and the write path are the kernel. They do not name a commodity or a country.
@@ -57,13 +67,14 @@ Honey is the second corridor, because the fraud there is content and a price pre
 
 ## Build order
 
-The five MVP phases, matching the exit checks in [blueprint.md](blueprint.md).
+The six MVP phases, matching the exit checks in [blueprint.md](blueprint.md).
 
 1. Parcel and harvest.
 2. Named merges.
 3. Handoff, load, and process mass balance.
 4. Packing, and a claim that cannot confuse biological origin with processing country.
 5. Authority aggregates and opened audit.
+6. Proofs: signed tree heads, counter-signatures, and inclusion and consistency proofs.
 
 Alerts are not a phase. Phase 1 already raises one, because a yield ceiling with no alert is a number nobody acts on.
 

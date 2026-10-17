@@ -13,7 +13,7 @@ The MVP is one cashew corridor with a small set of organizations who accept a si
 | What a stranger sees | A public claim page: commodity, biological origin country, process countries, claim status, packing expiry, and a quantity band. Exact weight, coordinates, and document hashes stay behind a role. |
 | How a lot changes hands | A `transfer` signed by the custodian and an `accept` signed by the receiver. Custody moves on the `accept`. A `transfer` nobody accepts opens an alert. |
 | Where private data lives | The same Postgres database. Narrow views are API projections and database privileges, not a second store. |
-| What “ledger” means here | An append-only event log. No token, no public chain, no permissioned chain in the MVP. |
+| What “ledger” means here | An append-only event log with a transparency log over it: signed tree heads, counter-signed by each organization, with inclusion and consistency proofs. No token, no public chain, no consensus network. The reasoning is in [ledger.md](ledger.md). |
 
 Offline capture at the farm gate is not in the MVP. Add it only if the pilot coop cannot record the harvest at a connected buying point.
 
@@ -200,6 +200,7 @@ There is no worker, cache, or object store in the MVP. Document files stay with 
 | Signatures | Ed25519 in the browser via WebCrypto. Server stores public keys only, one row per key version. |
 | Canonical form | RFC 8785 (JSON Canonicalization Scheme) |
 | Hash | SHA-256 over the canonical bytes |
+| Transparency log | Merkle tree and proofs after RFC 6962. Computed in the service, stored in Postgres. |
 | Hosting | One region, one service, managed Postgres, daily backups |
 
 The private key is generated in the browser when an organization enrolls. It is encrypted with a passphrase the organization keeps. The server may store the ciphertext so a new clerk machine can download it. The server cannot decrypt it. Signing happens in the browser after the passphrase is entered.
@@ -216,6 +217,22 @@ One key per organization with no version is a trap. Clerks share the passphrase,
 
 Nothing here needs a new event type. Rotation is rows in `org_keys`, which is why it belongs in the MVP even though no pilot organization will rotate during it.
 
+### Transparency log
+
+Signatures and per-lot hash chains show that history was not rewritten. They do not show that the operator is not the only party who decides what history is. One operator's database is controlled by one firm, and the episode asks for a record that no single firm controls. This section is the part that answers that. The decision, and what was rejected, is in [ledger.md](ledger.md).
+
+![The event log, the Merkle tree, a signed tree head, and the organizations that counter-sign it](diagrams/transparency-log.png)
+
+- `log_leaves` holds one row per event in insertion order: `seq`, `event_id`, and `leaf_hash`, which is the event's `event_hash`. The leaf is appended in the same transaction that inserts the event.
+- `tree_heads` holds a signed tree head: `tree_size`, `root_hash`, `signed_at`, and the operator's signature over those fields.
+- `head_endorsements` holds one row per organization per head: `tree_size`, `org_id`, `signature`, `signed_at`.
+- An **inclusion proof** shows that an event is a leaf of the tree of a given size. An organization checks it for its own events.
+- A **consistency proof** shows that the tree of size `n1` is a prefix of the tree of size `n2`. This is what catches a removal, an alteration, or a reorder.
+
+Once a party holds a head it counter-signed, the operator cannot change anything the head covers: the consistency proof fails, and four other organizations hold a head that disagrees. Cheating requires publishing two histories for the same tree size, which any two parties see the moment they compare heads.
+
+The log publishes hashes and a count. It publishes no payload, so a leaf says nothing about a grower, a weight, or a parcel, and "Translucent, not glass" is unaffected. The tree size does reveal how many events exist. That is accepted.
+
 ### Write path
 
 ![Session, event, signature, verification, refusal, store, and reply](diagrams/write-path.png)
@@ -225,7 +242,7 @@ Nothing here needs a new event type. Rotation is rows in `org_keys`, which is wh
 3. The browser signs `event_hash` and posts the event.
 4. The API checks the session, the capability, the holder, the signature against that `key_id`, the payload schema, and the head.
 5. The API runs the rejecting checks. A failure here returns an error and stores nothing.
-6. One database transaction inserts the event, moves the head, writes any `consume` events, moves `holder_org_id` on an `accept`, rebuilds the claim against the lot’s `profile_version`, and inserts alerts, including any inherited from a consumed input.
+6. One database transaction inserts the event, appends its leaf to the transparency log, moves the head, writes any `consume` events, moves `holder_org_id` on an `accept`, rebuilds the claim against the lot’s `profile_version`, and inserts alerts, including any inherited from a consumed input.
 7. The response is the new head and the claim status.
 
 Two clerks racing on the same lot: the second insert fails the unique constraint on `(lot_id, prev_hash)`. The client reloads the head and asks the clerk to submit again.
@@ -240,6 +257,9 @@ Two clerks racing on the same lot: the second insert fails the unique constraint
 | `GET /api/v1/transfers/incoming` | Receiving organization | Transfers awaiting an `accept`. |
 | `GET /api/v1/authority/retention?country=&season=` | Origin authority for that country | Weight leaving, and the share of process events in that country. Aggregates only, never a lot row. |
 | `GET /api/v1/lots/:id/audit` | Auditor, when the lot has an open alert or is in the lineage of an alerted lot | Full events, facility ids, gram weights, document hashes. |
+| `GET /api/v1/log/head` | Any enrolled organization | The latest signed tree head and the endorsements on it. |
+| `GET /api/v1/log/inclusion?event_id=&tree_size=` | The organization that signed the event, or an auditor | An inclusion proof for that event. |
+| `GET /api/v1/log/consistency?from=&to=` | Any enrolled organization | A consistency proof between two tree sizes. |
 
 The audit read is written to an `audit_opens` row: who, when, and which lot.
 
@@ -252,6 +272,8 @@ The audit read is written to an `audit_opens` row: who, when, and which lot.
 - A partial unique index on `lot_id` where `prev_hash is null` allows exactly one first event per lot. A plain composite unique does not do this, because Postgres treats each null as distinct and would let a lot have many first events.
 - A trigger rejects updates to `lots.profile_version`.
 - `claims` is updated only by the transaction that inserted the event.
+- The application role may `INSERT` into `log_leaves` and may not `UPDATE` or `DELETE` them. `seq` is monotonic and `event_id` is unique, so a leaf cannot be added twice or inserted out of order.
+- `tree_heads` and `head_endorsements` are insert-only. A head is never amended; a later head supersedes it.
 
 ### Authorization
 
@@ -297,6 +319,7 @@ Exit checks:
 - The harvest handler does not contain the strings `cashew` or `Côte d'Ivoire`.
 - An enrolling organization cannot set its own kind. The kind is recorded by the operator, and an organization awaiting approval can sign nothing. Self-declaring as an origin authority or an auditor would otherwise be a read-privilege escalation.
 - Two events signed by two key versions of the same organization both verify.
+- Every stored event has exactly one leaf in `log_leaves`, appended in the same transaction. A rolled-back write leaves no leaf behind.
 
 ### Phase 2 — Named merges
 
@@ -348,6 +371,19 @@ Exit checks:
 - An auditor can walk from an alerted harvest lot to the packed lot it ended up in.
 - A buyer sees the claim, the last inspection result with its report hash, and the band, and only for lots transferred to that buyer.
 
+### Phase 6 — Proofs
+
+The transparency log becomes checkable. Leaves have been written since Phase 1; this phase publishes heads and serves proofs.
+
+Exit checks:
+
+- The operator signs a tree head, and each enrolled organization can fetch it and counter-sign it.
+- An organization gets an inclusion proof for an event it signed and verifies it against a head it counter-signed, without asking the operator to vouch for anything.
+- A consistency proof between two tree sizes verifies.
+- An event altered directly in the database fails its inclusion proof against an endorsed head. This test is run by editing a row with database access the application role does not have.
+- A leaf removed or reordered fails the consistency proof.
+- Verification uses only the head, the proof, and the event. It does not re-query the operator for the answer.
+
 ### After the MVP
 
 In this order, and only when the pilot asks for them:
@@ -359,7 +395,8 @@ In this order, and only when the pilot asks for them:
 5. Fish only with a lab attestation required before a species claim.
 6. Settlement and retained-value sharing.
 7. An offline client, if buying points have no signal.
-8. A permissioned ledger for the hash chain, if a second operator refuses this database. The event JSON stays the same so the log can move.
+8. A public-chain anchor for the tree head, as a third-party timestamp. One hash, no payload, no token held. Deferred because it puts a funded wallet into the operations of a pilot, and a counter-signed head settles most disputes without it.
+9. A permissioned ledger for the hash chain, if a second operator refuses this database. The event JSON and the leaf definition stay the same so the log can move.
 
 ## Out of scope
 
@@ -373,4 +410,6 @@ In this order, and only when the pilot asks for them:
 
 ## How this stays honest
 
-The operator can refuse to publish, and can go offline. The operator cannot silently rewrite a history that other parties have already verified, because those parties hold the signatures and the hashes. That is the custody property this MVP owes. It is not a claim that a cartel is inside the database. When an alert fires, the trail leaves this system and goes to people who investigate companies and accounts.
+The operator can refuse to publish, and can go offline. The operator cannot rewrite a history that other parties have already verified, because those parties hold the signatures, the hashes, and a tree head they counter-signed. Changing anything an endorsed head covers breaks a consistency proof, and the only way around that is to publish two histories for the same tree size, which any two organizations see when they compare heads. That is what makes this a record no single firm controls, rather than a database with good intentions.
+
+It is not a claim that a cartel is inside the database. When an alert fires, the trail leaves this system and goes to people who investigate companies and accounts.

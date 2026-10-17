@@ -25,6 +25,8 @@ The horsemeat aside quotes both $30 million and $300 million. Treat that dollar 
 
 A distributed ledger is chain of custody: the same discipline applied to evidence, applied to goods. It keeps data that no single firm or country controls, and it shows the data was not rewritten. It is not a coin. Projects that tokenized bananas without paying the people in the middle failed the only test that matters: why would each hand write the next record?
 
+Both halves of that sentence are load-bearing, and they are met by different machinery. Signatures and hash chains show the data was not rewritten. A transparency log, with tree heads counter-signed by every organization in the corridor, is what stops one operator being the only party who decides what the history is. Neither needs a token or a consensus network. The decision is recorded in [ledger.md](ledger.md).
+
 The ledger cannot hold the crime. Over-the-counter commodity trades, fake shipping documents, and shell-company directors do not live on the chain. A ledger can show that a lot left a factory and met a ship. An investigation system has to join that to people, accounts, and companies when something smells wrong. Her image for the join is a lab tunnel: known input, unexpected output, so the crime is whatever happened in between.
 
 ## How a lot moves
