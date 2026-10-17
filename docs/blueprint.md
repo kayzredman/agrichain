@@ -121,7 +121,7 @@ A claim is derived. Users do not edit it.
 | Process countries | Appended by each `process` event, in order. |
 | Status | `clear` or `alert`. |
 | Packing expiry | Set when first known. A `relabel` does not replace it. |
-| Quantity band | A bucket, not the gram value: under 1 t, 1–5 t, 5–20 t, 20 t and over. |
+| Quantity band | A bucket from the commodity profile, not the gram value. The cashew profile uses under 1 t, 1–5 t, 5–20 t, and 20 t and over. |
 
 The buyer and the public page receive the band. The coop, the plant, and an opened audit receive grams.
 
@@ -216,6 +216,12 @@ The audit read is written to an `audit_opens` row: who, when, and which lot.
 
 A clerk can sign only with the key of their own organization, and only for a lot that organization currently holds. Harvest is the exception: it creates the lot.
 
+That table is the cashew seed, not the authorization model. A profile grants capabilities (`write:harvest`, `write:process`, `read:grams`, `open:audit`) to an organization kind. The API checks the capability. A lab or a port agent is a new grant, not a new column.
+
+## Kernel and configuration
+
+Lots, events, and claims stay generic. Cashew settings live in seed data: profile, corridor, bands, merge policy, claim fields, enabled checks, and capability grants. The harvest handler does not contain a commodity name or an origin country. A later concern adds a module and rows, as set out in [qa-modularity.md](qa-modularity.md).
+
 ## MVP roadmap
 
 Phases are sequential. A phase is done when its exit checks pass, not when the screens exist. Dates wait until a pilot coop and a plant are named.
@@ -230,6 +236,7 @@ Exit checks:
 - A second harvest that pushes the parcel over its ceiling is stored, and the lot’s claim is `alert`.
 - `biological_origin_country` cannot be updated.
 - The grower has no user account.
+- The harvest path reads the cashew profile from configuration. It does not hard-code the commodity or the origin country.
 
 ### Phase 2 — Named merges
 
@@ -240,7 +247,8 @@ Exit checks:
 - Every input lot has a `consume` event pointing at the output.
 - A consumed lot cannot be merged again.
 - Output grams must equal the sum of inputs, or an alert opens.
-- The output lot’s biological origin is Côte d'Ivoire, copied from the inputs. Mixed-origin merges are rejected in the MVP.
+- The output lot’s biological origin is copied from the inputs.
+- The cashew profile rejects a mixed-origin merge. The test fixture uses Côte d'Ivoire. The merge code does not.
 
 ### Phase 3 — Load and process
 
@@ -248,7 +256,7 @@ Record the lot leaving the country and the plant turning raw nuts into outputs p
 
 Exit checks:
 
-- The process country is stored and is different from biological origin when the plant is abroad.
+- The process country is stored beside biological origin. The pilot plant is abroad. A profile may process at home.
 - Outputs plus loss must equal the input, or an alert opens.
 - The plant cannot process a lot it does not hold.
 

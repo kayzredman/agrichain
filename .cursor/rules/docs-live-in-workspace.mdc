@@ -10,3 +10,5 @@ Write design notes, decisions, and project documents under `docs/` in this repos
 The source of truth is those files. A chat canvas may illustrate them. It does not replace them.
 
 Read `docs/design-laws.md` before changing the product. A feature that breaks a law there needs an explicit decision recorded in `docs/`.
+
+Follow `docs/git-plan.md` for branches. Work and commit on local `dev`. After QA, push `origin/dev`, then `origin/main`, then fast-forward local `main`. Do not commit on `main` and do not force-push.

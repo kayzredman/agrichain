@@ -13,5 +13,7 @@ Figures cited from the episode are what the guest stated. They are not a separat
 | [system.md](system.md) | Records, access, invariants, first corridor, build order |
 | [blueprint.md](blueprint.md) | Solution blueprint, technical architecture, and MVP roadmap |
 | [agriChain Solution Blueprint.docx](agriChain%20Solution%20Blueprint.docx) | The same blueprint as a Word document |
+| [git-plan.md](git-plan.md) | Branch flow: local dev, remote dev after QA, then main |
+| [qa-modularity.md](qa-modularity.md) | QA: kernel versus commodity configuration |
 
 Source: [Food and the Fight for Global Security](https://www.youtube.com/watch?v=P-qcYDpPTB4). Guest: Genevieve Leveille, CEO of AgriLedger. Host: Siren, Galway.

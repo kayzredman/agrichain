@@ -31,9 +31,17 @@ agriChain keeps the lot honest. A system like Siren, which hosts the source epis
 
 A process event cannot emit more than it received, after a declared loss. Additives are inputs. A parcel cannot certify more harvest in a season than its ceiling, and the ceiling drops when fertilizer or seed attestations are missing. A relabel cannot move expiry earlier in the story than packing. A ship event that skips a declared port, or adds one, opens an alert rather than rewriting the route. Biological origin has no update operation.
 
+## Kernel and configuration
+
+The records, the signed event envelope, and the write path are the kernel. They do not name a commodity or a country.
+
+A commodity profile and a corridor are configuration in Postgres. The profile lists enabled event types, enabled checks, claim fields, quantity bands, merge policy, and which capabilities each organization kind has. The corridor names the profile and the origin country. The cashew pilot is the first seed, not a rule in the harvest flow.
+
+A later concern (honey, fish, fertilizer, a vessel call, an investigation export) is a module plus rows in that configuration. The module may add an event type, a named check, a claim field, or a read projection. It does not add another lot table. The QA of this split is in [qa-modularity.md](qa-modularity.md).
+
 ## First corridor
 
-Cashew, Côte d'Ivoire to a processor country to a European buyer. It forces aggregation of many small growers, a process step that today steals the origin story, and a value-retention number a government can read.
+Cashew, Côte d'Ivoire to a processor country to a European buyer. It forces aggregation of many small growers, a process step that today steals the origin story, and a value-retention number a government can read. Those facts are seed data for the `cashew` profile and one corridor.
 
 Honey is the second corridor, because the fraud there is content and a price premium. Fish needs a lab attestation on the inspect event before species claims are allowed.
 
