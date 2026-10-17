@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>agriChain mockups — cashew pilot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="rail">
+      <p class="brand">agriChain</p>
+      <p class="pilot">Cashew pilot mockup</p>
+      <label class="step-label">
+        Step
+        <select class="step-select" id="step"></select>
+      </label>
+      <nav id="nav" aria-label="Lot path"></nav>
+    </aside>
+    <div class="workspace">
+      <main id="main" tabindex="-1">
+        <section data-screen="enroll" data-role="Coop clerk">
+          <div class="screen-head">
+            <div>
+              <h1>Enroll the cooperative</h1>
+              <p class="lede">The clerk creates the organization’s signing key. The server will keep the public key. The passphrase stays with the cooperative.</p>
+            </div>
+            <p class="role">Coop clerk</p>
+          </div>
+          <form data-next="parcel" data-done="Key created, version 1. Public key registered for Coopérative de Bondoukou.">
+            <div class="fields">
+              <label>Organization name
+                <input name="org" value="Coopérative de Bondoukou" required>
+              </label>
+              <label>Kind
+                <span class="hint">Recorded by the operator, not chosen here. An organization cannot declare itself an authority or an auditor.</span>
+                <input value="Coop · approved 14 October 2026" readonly>
+              </label>
+              <label>Country
+                <input name="country" value="Côte d'Ivoire" required>
+              </label>
+              <label>Passphrase
+                <span class="hint">Used only in this browser to unlock the key.</span>
+                <input name="pass" type="password" value="bondoukou-2026" autocomplete="new-password" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Create signing key</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="parcel" data-role="Coop clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Register a parcel</h1>
+              <p class="lede">Commodity comes from the cashew profile. The ceiling is the season figure the harvests will be judged against.</p>
+            </div>
+            <p class="role">Coop clerk</p>
+          </div>
+          <form data-next="harvest" data-done="Parcel BD-14 saved. Ceiling 18,000 kg for season 2026.">
+            <div class="fields">
+              <label>Parcel
+                <input name="name" value="BD-14" required>
+              </label>
+              <label>Commodity
+                <span class="hint">From the cashew profile. Not typed by the clerk.</span>
+                <input value="Cashew" readonly>
+              </label>
+              <label>Country
+                <input name="country" value="Côte d'Ivoire" required>
+              </label>
+              <label>Area
+                <input name="area" value="12 ha" required>
+              </label>
+              <label>Season
+                <input name="season" value="2026" required>
+              </label>
+              <label>Yield ceiling
+                <span class="hint">Stored as grams. Shown here as kilograms.</span>
+                <input name="ceiling" value="18,000 kg" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Save parcel</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="harvest" data-role="Coop clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Record a harvest</h1>
+              <p class="lede">The grower is named on the event and does not get an account. Signing fixes biological origin to the parcel’s country.</p>
+            </div>
+            <p class="role">Coop clerk</p>
+          </div>
+          <div class="panel">
+            <h2>Already signed this season</h2>
+            <table>
+              <thead>
+                <tr><th>Lot</th><th>Grower</th><th>Weight</th><th>Origin</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>H-1042</td><td>Kouadio N'Guessan</td><td>3,800 kg</td><td>Côte d'Ivoire</td></tr>
+                <tr><td>H-1043</td><td>Ama Serwaa</td><td>2,600 kg</td><td>Côte d'Ivoire</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <form data-next="merge" data-done="Harvest H-1041 signed. Origin locked to Côte d'Ivoire. It cannot be edited.">
+            <div class="fields">
+              <label>Parcel
+                <select name="parcel"><option>BD-14 · Côte d'Ivoire</option></select>
+              </label>
+              <label>Grower
+                <span class="hint">A name on the record. No login is created.</span>
+                <input name="grower" value="Awa Kouassi" required>
+              </label>
+              <label>Weight
+                <input name="weight" value="4,200 kg" required>
+              </label>
+              <label>Passphrase
+                <input name="pass" type="password" value="bondoukou-2026" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Sign harvest</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="merge" data-role="Coop clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Merge the harvests</h1>
+              <p class="lede">One intake lot. The output weight has to equal the sum of the inputs. Mixed origins are refused by the cashew profile.</p>
+            </div>
+            <p class="role">Coop clerk</p>
+          </div>
+          <form data-next="transfer" data-done="Intake lot M-220 signed. 10,600 kg. Origin remains Côte d'Ivoire.">
+            <div class="panel">
+              <label class="checkline"><input type="checkbox" checked> H-1041 · Awa Kouassi · 4,200 kg</label>
+              <label class="checkline"><input type="checkbox" checked> H-1042 · Kouadio N'Guessan · 3,800 kg</label>
+              <label class="checkline"><input type="checkbox" checked> H-1043 · Ama Serwaa · 2,600 kg</label>
+              <p class="balance">Output <strong>10,600 kg</strong>. Sum of inputs <strong>10,600 kg</strong>. <span class="status clear">Balances</span></p>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Sign merge</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="transfer" data-role="Coop clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Transfer to the plant</h1>
+              <p class="lede">This names who the lot is going to. It does not hand it over. The cooperative still holds M-220 until the plant signs its own event.</p>
+            </div>
+            <p class="role">Coop clerk</p>
+          </div>
+          <form data-next="load" data-done="Transfer signed. The cooperative still holds M-220. Awaiting the plant’s accept.">
+            <div class="fields">
+              <label>Lot
+                <input value="M-220 · 10,600 kg" readonly>
+              </label>
+              <label>Receiver
+                <span class="hint">Only this organization can accept. Nobody else can take the lot.</span>
+                <select name="receiver"><option>Saigon Kernel Plant · Vietnam</option></select>
+              </label>
+              <label>Reason
+                <select name="reason"><option>Processing</option><option>Sale</option><option>Storage</option></select>
+              </label>
+              <label>Accept window
+                <span class="hint">From the corridor. A sea leg gets weeks. An unaccepted transfer opens an alert when this runs out.</span>
+                <input value="45 days" readonly>
+              </label>
+              <label>Passphrase
+                <input name="pass" type="password" value="bondoukou-2026" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Sign transfer</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="load" data-role="Coop clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Record the load</h1>
+              <p class="lede">The lot leaves Côte d'Ivoire. This event does not change where it grew, and it does not change who holds it.</p>
+            </div>
+            <p class="role">Coop clerk</p>
+          </div>
+          <form data-next="accept" data-done="Load signed. M-220 left Abidjan for Ho Chi Minh City. Held by the cooperative, transferred to Saigon Kernel Plant.">
+            <div class="fields">
+              <label>Lot
+                <input value="M-220 · 10,600 kg" readonly>
+              </label>
+              <label>Carrier
+                <input name="carrier" value="MV Sassandra" required>
+              </label>
+              <label>From port
+                <input name="from" value="Abidjan" required>
+              </label>
+              <label>To port
+                <input name="to" value="Ho Chi Minh City" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Sign load</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="accept" data-role="Plant clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Accept intake</h1>
+              <p class="lede">The handoff gets its second signature here. This is the only event that moves custody, and the plant can do nothing with the lot until it is signed.</p>
+            </div>
+            <p class="role">Plant clerk</p>
+          </div>
+          <div class="panel">
+            <h2>Waiting to be accepted</h2>
+            <table>
+              <thead>
+                <tr><th>Lot</th><th>From</th><th>Transferred</th><th>Window left</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>M-220</td><td>Coopérative de Bondoukou</td><td>2 September 2026</td><td>13 days</td></tr>
+                <tr><td>M-214</td><td>Coopérative de Bondoukou</td><td>19 July 2026</td><td><span class="status alert">Expired</span></td></tr>
+              </tbody>
+            </table>
+            <p class="hint">M-214 ran out of window. An alert is open on it and the cooperative still holds it. Nothing was deleted.</p>
+          </div>
+          <form data-next="process" data-done="Accept signed. The plant now holds M-220. The cooperative no longer does.">
+            <div class="fields">
+              <label>Lot
+                <input value="M-220 · 10,600 kg raw" readonly>
+              </label>
+              <label>Weighed on arrival
+                <span class="hint">A shortfall beyond the corridor tolerance opens an alert. It does not refuse the event.</span>
+                <input name="weighed" value="10,600 kg" required>
+              </label>
+              <label>Passphrase
+                <input name="pass" type="password" value="saigon-plant" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Sign accept</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="process" data-role="Plant clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Record processing</h1>
+              <p class="lede">The plant adds Vietnam as the process country. Kernels plus the declared loss must equal the raw nuts received.</p>
+            </div>
+            <p class="role">Plant clerk</p>
+          </div>
+          <form data-next="pack" data-done="Process signed. Origin stays Côte d'Ivoire. Vietnam is recorded beside it.">
+            <div class="fields">
+              <label>Input lot
+                <input value="M-220 · 10,600 kg raw" readonly>
+              </label>
+              <label>Plant
+                <input value="Saigon Kernel Plant" readonly>
+              </label>
+              <label>Process country
+                <input name="country" value="Vietnam" required>
+              </label>
+              <label>Kernel output
+                <input name="out" value="2,544 kg" required>
+              </label>
+              <label>Declared loss
+                <span class="hint">Shells and waste. Counted, not hidden.</span>
+                <input name="loss" value="8,056 kg" required>
+              </label>
+              <label>Passphrase
+                <input type="password" value="saigon-plant" required>
+              </label>
+            </div>
+            <p class="balance">2,544 kg + 8,056 kg = 10,600 kg. <span class="status clear">Balances</span></p>
+            <p class="hint">More out than in would be refused outright. A shortfall would be stored with an alert, because undeclared loss is the thing worth seeing.</p>
+            <div class="actions">
+              <button class="primary" type="submit">Sign process</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="pack" data-role="Plant clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Pack the kernels</h1>
+              <p class="lede">This sets the expiry and mints the code the bag carries. It runs once. A later relabel cannot move either of them without opening an alert.</p>
+            </div>
+            <p class="role">Plant clerk</p>
+          </div>
+          <form data-next="public" data-done="Pack signed. Code AC-7K2M minted. Packing expiry 12 March 2027 is now fixed on the claim.">
+            <div class="fields">
+              <label>Lot
+                <input value="K-220A · 2,544 kg kernel" readonly>
+              </label>
+              <label>Packing expiry
+                <span class="hint">Bound to the lot here. This is the date a relabel is judged against.</span>
+                <input name="expiry" value="12 March 2027" required>
+              </label>
+              <label>Public code
+                <span class="hint">Minted once. Changing it later opens an alert.</span>
+                <input value="AC-7K2M" readonly>
+              </label>
+              <label>Passphrase
+                <input name="pass" type="password" value="saigon-plant" required>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Sign pack</button>
+            </div>
+            <p class="note" data-result hidden></p>
+          </form>
+        </section>
+
+        <section data-screen="public" data-role="Public" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Public claim</h1>
+              <p class="lede">What a person gets from the code on the bag. No grower name, no coordinates, no gram weight.</p>
+            </div>
+            <p class="role">Public</p>
+          </div>
+          <form>
+            <label>Code on the bag
+              <input value="AC-7K2M" readonly>
+            </label>
+          </form>
+          <div class="panel">
+            <h2>Cashew <span class="status clear">Clear</span></h2>
+            <dl class="claim">
+              <dt>Biological origin</dt><dd>Côte d'Ivoire</dd>
+              <dt>Processed in</dt><dd>Vietnam</dd>
+              <dt>Weight band</dt><dd>1–5 t</dd>
+              <dt>Packing expiry</dt><dd>12 March 2027</dd>
+            </dl>
+          </div>
+          <div class="actions">
+            <button class="primary" type="button" data-jump="buyer">Open the buyer view</button>
+          </div>
+        </section>
+
+        <section data-screen="buyer" data-role="Buyer" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Buyer view</h1>
+              <p class="lede">The claim, the last inspection, and the band. Still no gram weight and no farm location.</p>
+            </div>
+            <p class="role">Buyer</p>
+          </div>
+          <div class="panel">
+            <h2>AC-7K2M <span class="status clear">Clear</span></h2>
+            <dl class="claim">
+              <dt>Commodity</dt><dd>Cashew</dd>
+              <dt>Biological origin</dt><dd>Côte d'Ivoire</dd>
+              <dt>Processed in</dt><dd>Vietnam</dd>
+              <dt>Weight band</dt><dd>1–5 t</dd>
+              <dt>Last inspection</dt><dd>Pass · report hash 4f2a…c91</dd>
+            </dl>
+            <p class="hint">This buyer sees the inspection because K-220A was transferred to it. The hash is here so the buyer can check the report it was emailed. The file is not stored.</p>
+          </div>
+          <div class="actions">
+            <button class="primary" type="button" data-jump="authority">Open the authority view</button>
+          </div>
+        </section>
+
+        <section data-screen="authority" data-role="Origin authority" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Value kept at origin</h1>
+              <p class="lede">Côte d'Ivoire sees how much left and whether the cracking happened at home. Aggregates for the season, never a single lot.</p>
+            </div>
+            <p class="role">Origin authority</p>
+          </div>
+          <div class="metric">
+            <div><strong>41,800 t</strong><span>Raw cashew leaving the country, season 2026</span></div>
+            <div><strong>6%</strong><span>Process steps that happened in Côte d'Ivoire</span></div>
+          </div>
+          <div class="panel">
+            <h2>Season 2026, by processing country</h2>
+            <table>
+              <thead>
+                <tr><th>Processed in</th><th>Share of steps</th><th>Weight</th><th>Lots</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Vietnam</td><td>58%</td><td>24,200 t</td><td>1,914</td></tr>
+                <tr><td>India</td><td>31%</td><td>12,900 t</td><td>1,002</td></tr>
+                <tr><td>Côte d'Ivoire</td><td>6%</td><td>2,600 t</td><td>188</td></tr>
+                <tr><td>Other</td><td>5%</td><td>2,100 t</td><td>147</td></tr>
+              </tbody>
+            </table>
+            <p class="hint">No lot code and no single-lot weight on this page. This reader asks a question about a country, so it is answered with a country.</p>
+          </div>
+          <div class="actions">
+            <button class="secondary" type="button" data-jump="audit">Switch to the auditor view</button>
+          </div>
+        </section>
+
+        <section data-screen="audit" data-role="Auditor" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Opened audit</h1>
+              <p class="lede">This door opens only because lot AC-9Q has an alert. The open is logged. The clean lot AC-7K2M is not on this page.</p>
+            </div>
+            <p class="role">Auditor</p>
+          </div>
+          <p class="note">Opened by A. Mensah, origin authority desk, 17 October 2026, 09:14. Lot AC-9Q.</p>
+          <div class="panel">
+            <h2>AC-9Q <span class="status alert">Alert</span></h2>
+            <p>Parcel BD-09 ceiling is 8,000 kg. Signed harvests total 9,400 kg. The events stay on the record.</p>
+            <table>
+              <thead>
+                <tr><th>Event</th><th>Signer</th><th>Detail</th><th>Grams</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Harvest</td><td>Coopérative de Bondoukou</td><td>Grower Yao Kouame · parcel BD-09</td><td>5,100,000</td></tr>
+                <tr><td>Harvest</td><td>Coopérative de Bondoukou</td><td>Grower Akissi Bamba · parcel BD-09</td><td>4,300,000</td></tr>
+                <tr><td>Check</td><td>Profile rule</td><td>Season total is over the ceiling</td><td>9,400,000</td></tr>
+              </tbody>
+            </table>
+            <p class="hint">Document hash on the intake sheet: 9c1e…aa4. The file itself is not stored here.</p>
+          </div>
+          <div class="panel">
+            <h2>Where the alert went</h2>
+            <p>A merge does not wash this off. The lots AC-9Q became carry the alert, and the auditor can walk the whole way to the bag.</p>
+            <table>
+              <thead>
+                <tr><th>Lot</th><th>Step</th><th>Status</th><th>Why</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>AC-9Q</td><td>Harvest</td><td><span class="status alert">Alert</span></td><td>Over the parcel ceiling</td></tr>
+                <tr><td>M-231</td><td>Merge</td><td><span class="status alert">Alert</span></td><td>Inherited from AC-9Q</td></tr>
+                <tr><td>K-231B</td><td>Process, pack</td><td><span class="status alert">Alert</span></td><td>Inherited from M-231</td></tr>
+              </tbody>
+            </table>
+            <p class="hint">The public claim on K-231B shows an alert too. It does not say why, and it does not name the grower.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

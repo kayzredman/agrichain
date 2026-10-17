@@ -16,7 +16,7 @@ The six records, the signed event envelope, and the single write path do not men
 | Mixed-origin merges are rejected | Phase 2, stated as a product rule. | A commodity that allows blending has to fork `merge`. |
 | Quantity bands are 1 t, 5 t, 20 t | Claim rules. | Honey is sold in grams. Those buckets publish a useless band. |
 | Roles are four columns | Authorization table: harvest, process, grams, audit. | A lab, a port agent, or a fertilizer supplier does not fit a column. |
-| Checks are a fixed list in the write path | Yield, merge balance, process balance, relabel. | Fish must block a species claim without a passing inspection. That check has nowhere to plug in. |
+| Checks are a fixed list in the write path | Yield, balance, transfer window, relabel. | Fish must block a species claim without a passing inspection. That check has nowhere to plug in. |
 | Claim fields are a fixed set | Commodity, origin, process countries, expiry, band. | Halal, species, and honey grade were in the product model and dropped from the blueprint. |
 | Process-abroad is an exit check | Phase 3 expects the plant country to differ from origin. | A country that cracks its own nuts fails a test that should only describe this pilot. |
 
@@ -34,13 +34,17 @@ Each later concern is a module. A module may add an event type, a named check, a
 
 | Module | On for cashew | Adds |
 | --- | --- | --- |
-| Custody | Yes | `harvest`, `merge`, `consume`, `load`, `process`, `relabel` |
-| Mass and yield | Yes | Ceiling and balance checks. Thresholds come from the profile. |
-| Credence | No | `inspect`. A claim field such as species or honey grade stays off until a passing inspection exists. |
+| Custody | Yes | `harvest`, `merge`, `consume`, `transfer`, `accept`, `load`, `process`, `pack`, `inspect`, `relabel` |
+| Mass and yield | Yes | Ceiling and balance checks. Thresholds and tolerances come from the profile. |
+| Credence | No | Claim gating only. A claim field such as species or honey grade stays off until a passing inspection exists. The `inspect` event itself is in the kernel. |
 | Voyage | No | `call`. An undeclared port opens an alert. |
 | Inputs | No | A fertilizer or seed attestation. A missing one lowers the ceiling. |
 | Investigation export | No | A read of the lot path, hashes, and organization ids. |
 | Settlement | No | `release` and retained-value sharing. |
+
+`inspect` used to sit in Credence while the blueprint listed it as an MVP event and the Phase 5 exit check depended on it. One of the two had to move. The event is in the kernel, because a pass or fail with a report hash needs no commodity knowledge, and the buyer view is worth nothing without it. What Credence actually adds is the gate: a rule that a claim field may not be published without a passing inspection. That gate is off for cashew, which publishes no species or grade.
+
+Custody grew two events for the same reason the review found them missing: the docs required a holder everywhere and no event ever moved one. `transfer` and `accept` are kernel, not a module, because every commodity changes hands.
 
 ## What is configuration
 
@@ -52,11 +56,15 @@ Stored in Postgres and seeded. Changing it does not require a change to the even
 | Corridor | Côte d'Ivoire to a processor country to a European buyer | Insert another origin or destination. |
 | Merge policy | Same biological origin only | Set `allow_mixed` on a profile that blends. |
 | Quantity bands | Under 1 t, 1–5 t, 5–20 t, 20 t and over | A gram scale on the honey profile. |
-| Claim fields | Origin, process countries, status, packing expiry, band | Add species or grade on that profile. |
-| Enabled checks | Ceiling, merge balance, process balance, relabel | Turn on `species_requires_inspect` for fish. |
-| Capabilities | Coop writes harvest and merge. Plant writes process. Buyer reads the claim. Authority reads retention for its country. Auditor opens an alerted lot. | Grant `inspect` to a lab without a new role column. |
+| Claim fields | Commodity, origin, process countries, status, packing expiry, band | Add species or grade on that profile. |
+| Enabled checks | Ceiling, merge shortfall, process shortfall, unaccepted transfer, relabel | Turn on `species_requires_inspect` for fish. |
+| Balance tolerance | A gram or basis-point allowance on a shortfall | A corridor weighing wet nuts needs a wider one than a corridor weighing dry. |
+| Transfer window | How long a `transfer` may sit unaccepted before an alert | A sea leg needs weeks. A truck to the next town needs a day. |
+| Capabilities | Coop writes harvest, merge, transfer, and load. Plant accepts, processes, packs, and inspects. Buyer reads the claims of lots transferred to it. Authority reads aggregates for its country. Auditor opens an alerted lineage. | Grant `write:inspect` to a lab without a new role column. |
 
-Capabilities are names (`write:harvest`, `read:grams`, `open:audit`), granted to an organization kind on a profile. The API asks whether this organization holds the capability. It does not switch on the job title.
+Capabilities are names (`write:harvest`, `write:accept`, `read:grams`, `read:aggregates`, `open:audit`), granted to an organization kind on a profile. The API asks whether this organization holds the capability. It does not switch on the job title.
+
+Configuration is versioned. A lot records the `profile_version` it was created under and its claim is always rebuilt against that version, so editing a band or a tolerance cannot quietly change what an already published claim means.
 
 Check functions live in code, one module each, registered by name. The profile lists the names that run. Adding cashew-sized bands is a row. Adding a new kind of check is one module, then a row that turns it on.
 

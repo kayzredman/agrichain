@@ -15,6 +15,7 @@ Figures cited from the episode are what the guest stated. They are not a separat
 | [agriChain Solution Blueprint.docx](agriChain%20Solution%20Blueprint.docx) | The same blueprint as a Word document |
 | [git-plan.md](git-plan.md) | Branch flow: local dev, remote dev after QA, then main |
 | [qa-modularity.md](qa-modularity.md) | QA: kernel versus commodity configuration |
+| [qa-acceptance.md](qa-acceptance.md) | QA: final acceptance of the design, flow, and architecture |
 
 Drawings live in [diagrams/](diagrams) and are included in the docs above: the lot path, who can see a lot, the service architecture, the write path, the modules, the blind spots, and the git promotion.
 

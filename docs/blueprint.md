@@ -10,7 +10,8 @@ The MVP is one cashew corridor with a small set of organizations who accept a si
 | --- | --- |
 | Who may disagree with the database | Coop, plant, buyer, and origin authority accept one operator. Each event is signed by the organization that witnessed it. Any of them can recompute the hash chain. |
 | Who writes a harvest | A coop clerk, in a web app, naming the grower and the parcel. Growers are records. They do not need an account in the MVP. |
-| What a stranger sees | A public claim page: commodity, biological origin country, process countries, claim status. Exact weight, coordinates, and document hashes stay behind a role. |
+| What a stranger sees | A public claim page: commodity, biological origin country, process countries, claim status, packing expiry, and a quantity band. Exact weight, coordinates, and document hashes stay behind a role. |
+| How a lot changes hands | A `transfer` signed by the custodian and an `accept` signed by the receiver. Custody moves on the `accept`. A `transfer` nobody accepts opens an alert. |
 | Where private data lives | The same Postgres database. Narrow views are API projections and database privileges, not a second store. |
 | What “ledger” means here | An append-only event log. No token, no public chain, no permissioned chain in the MVP. |
 
@@ -25,9 +26,9 @@ agriChain keeps a lot of cashew honest from a parcel in Côte d'Ivoire to a Euro
 | Who | Account | What they write or read |
 | --- | --- | --- |
 | Grower | None | Named on a harvest. No login. |
-| Coop clerk | Yes | Registers parcels, writes harvests, merges lots, records the load that leaves the country. |
-| Plant clerk | Yes | Receives a lot, records processing, loss, and outputs. |
-| Buyer | Yes | Reads the claim, the last inspection, and a quantity band. |
+| Coop clerk | Yes | Registers parcels, writes harvests, merges lots, transfers the lot to the plant, records the load that leaves the country. |
+| Plant clerk | Yes | Accepts custody of a lot, records processing, loss, and outputs, packs and inspects. |
+| Buyer | Yes | Reads the claim, the last inspection, and a quantity band, for lots transferred to it. |
 | Origin authority | Yes | Reads volumes leaving Côte d'Ivoire and where processing happened. |
 | Auditor | Yes, granted by the operator | Opens the full path when an alert exists. |
 | Public | None | Opens a claim page from a code on the bag. |
@@ -36,9 +37,9 @@ A broker is an organization that can enroll and sign events it witnessed. The MV
 
 ### Path of a lot
 
-The coop clerk signs until the lot leaves the country. The plant clerk signs the processing. The claim is calculated. Biological origin stays the country of harvest. The plant’s country is added beside it.
+The coop clerk signs until the lot leaves the country, ending with a `transfer` to the plant. The plant clerk signs the `accept` that takes custody, then the processing. The claim is calculated. Biological origin stays the country of harvest. The plant’s country is added beside it.
 
-![Parcel, harvest, merge, load, process, and claim, with the person who signs each step](diagrams/lot-flow.png)
+![Parcel, harvest, merge, transfer, load, accept, process, pack, and claim, with the person who signs each step](diagrams/lot-flow.png)
 
 The same lot is narrower for a stranger than it is for the coop.
 
@@ -48,9 +49,11 @@ The same lot is narrower for a stranger than it is for the coop.
 
 - A harvest names a parcel, a season, a grower, and a weight.
 - Several harvests become one lot, and every input stays attached.
+- Every change of hands has two signatures: the side letting go, and the side taking it.
 - The plant cannot ship more kernel than the raw nuts support. Loss is declared. Shells are either an output or part of that loss.
 - The public claim says the nuts grew in Côte d'Ivoire even when they were cracked somewhere else.
-- An over-yield, a broken mass balance, or a relabel that moves the date opens an alert and still keeps the event.
+- An over-yield, a short mass balance, a relabel that moves the date, or a handoff nobody accepted opens an alert and still keeps the event.
+- An alert on a harvest lot is still visible on the claim of the lot it was merged into.
 - The origin authority can see whether the cracking happened at home or abroad.
 
 Settlement, payments, and an investigation graph are not part of this proof.
@@ -67,30 +70,41 @@ The six records in [system.md](system.md) map to tables as follows.
 | --- | --- | --- |
 | Actor | `actors`, `memberships` | A person or an organization. A clerk belongs to one organization. |
 | Place | `places` | Parcel, plant, port, or vessel. A parcel holds a season yield ceiling in grams. |
-| Lot | `lots` | One commodity. `biological_origin_country` is insert-only. |
+| Lot | `lots` | One commodity. `biological_origin_country` is insert-only. `holder_org_id` is the current custodian. `profile_version` records the configuration the lot was judged under. |
 | Event | `events` | Append-only. The lot stores `head_event_id`. |
 | Claim | `claims` | Rebuilt in the same transaction as the event that changed it. |
 | Alert | `alerts` | Opened by a check. Never deletes the event. |
 
 Growers and parcels can exist before any login. A parcel stores country, area, commodity, season, and a manual yield ceiling. For the MVP that ceiling is entered by the coop from a published figure for the area. It is the number the harvest is judged against.
 
+`lots.holder_org_id` is a projection, not a second source of truth. It is written in the same transaction as the `accept` event that moved custody, and the write path reads it instead of replaying the chain on every request. An auditor can rebuild it from the events alone.
+
+`lots.profile_version` is set when the lot is created and never changes. A band, a tolerance, or a claim field can be edited in configuration later, so without this a published claim would silently change meaning. The claim is always recomputed against the version the lot carries.
+
 ### Event types in the MVP
 
 | Type | Who signs | What it does |
 | --- | --- | --- |
-| `harvest` | Coop | Creates a lot. Sets biological origin. Names parcel, grower, season, weight. |
-| `merge` | Current custodian | Creates an output lot. Consumes each input lot. Output weight equals the sum of inputs. |
-| `consume` | Same signer, same transaction as `merge` or `process` | Closes an input lot and points at the output. |
+| `harvest` | Coop | Creates a lot. Sets biological origin. Names parcel, grower, season, weight. Custody starts with the signer. |
+| `merge` | Current custodian | Creates an output lot. Consumes each input lot. Output weight equals the sum of inputs. Commits to each input lot’s head hash. |
+| `consume` | Written by the server, in the same transaction as `merge` or `process` | Closes an input lot and points at the output. Never submitted by a client, so it has no capability of its own. |
+| `transfer` | Current custodian | Names the receiving organization and the reason. Custody does not move yet. |
+| `accept` | Receiving organization | Takes custody. Moves `holder_org_id`. The only event that changes the custodian. |
 | `load` | Custodian | Records carrier, origin port, destination port, and the country the lot is leaving. |
 | `process` | Plant | Consumes the input lot. Creates output lots. Declares additives and loss. Records the process country. |
+| `pack` | Plant | Sets the packing expiry and mints the public code the bag carries. Runs once per lot. |
 | `inspect` | Lab or plant | Stores a pass or fail and the hash of the report. Does not store the file. |
-| `relabel` | Custodian | Proposes a new label, code, or expiry. The claim keeps the packing expiry. |
+| `relabel` | Custodian | Proposes a new label, code, or expiry. The claim keeps the packing expiry from `pack`. |
 
 `split`, vessel `call`, and `release` exist as names in the product model. They are not required to finish the cashew MVP. A voyage with an extra port is the first event type added when a real shipment needs it.
 
+`inspect` stays in the kernel rather than in a module. The buyer view and the Phase 5 exit check both depend on it, and a pass or fail with a report hash needs no commodity knowledge. What the Credence module adds later is claim *gating*, the rule that a species or a honey grade may not be published without a passing inspection. That gate is off for cashew.
+
+In the pilot the plant signs `inspect`. No lab is enrolled on the first path, which is why the people table has no lab row. Granting `write:inspect` to a lab is a row, not a schema change.
+
 ### Canonical event
 
-Every event is a JSON object with a fixed field order, signed as UTF-8 bytes:
+Every event is a JSON object serialized by RFC 8785, the JSON Canonicalization Scheme, and signed as UTF-8 bytes:
 
 ```json
 {
@@ -99,13 +113,21 @@ Every event is a JSON object with a fixed field order, signed as UTF-8 bytes:
   "type": "harvest",
   "prev_hash": "hex or null for the first event",
   "actor_id": "uuid of the signing organization",
+  "key_id": "uuid of the signing key version",
+  "observed_at": "RFC 3339 instant the signer witnessed this",
   "payload": {}
 }
 ```
 
-`payload_hash` is SHA-256 of the canonical JSON. The organization signs `payload_hash` with Ed25519. The lot’s chain links `prev_hash` to the previous event’s `payload_hash`. The first event on a lot uses `prev_hash: null`, and only one such event is allowed.
+RFC 8785 is named rather than described, because "a fixed field order" is not something a second party can reimplement. A coop, a buyer, and an auditor have to produce the same bytes from the same event or none of them can check a signature.
 
-The server rejects a body whose signature does not match the organization’s registered public key, whose `prev_hash` is not the current head, or whose `id` has already been stored. A retry of the same `id` returns the stored event.
+`event_hash` is SHA-256 of those canonical bytes. The organization signs `event_hash` with Ed25519, and the stored row keeps `event_hash`, `signature`, and `key_id` beside the event. The lot’s chain links `prev_hash` to the previous event’s `event_hash`. The first event on a lot uses `prev_hash: null`, and only one such event is allowed.
+
+`observed_at` is signed by the clerk and is the time the thing happened. The server’s `received_at` is stored outside the signature and is the time the record arrived. The two are different facts, and expiry, season, and the transfer window all depend on the first one. The server rejects an `observed_at` in the future or older than a window the profile sets.
+
+The server rejects a body whose signature does not match the public key of that `key_id`, whose `key_id` does not belong to the signing organization, whose `prev_hash` is not the current head, or whose `id` has already been stored. A retry of the same `id` returns the stored event.
+
+A merged lot’s first event is `merge` with `prev_hash: null`, so the per-lot chains do not link across the merge on their own. The merge payload therefore commits to the `event_hash` of each input lot’s head. Lineage is then hash-committed in both directions: the `consume` on the input points forward, and the hash in the merge payload points back.
 
 ### Claims and bands
 
@@ -116,23 +138,45 @@ A claim is derived. Users do not edit it.
 | Commodity | Copied from the harvest. |
 | Biological origin | Copied from the harvest. No later event writes this field. |
 | Process countries | Appended by each `process` event, in order. |
-| Status | `clear` or `alert`. |
-| Packing expiry | Set when first known. A `relabel` does not replace it. |
+| Status | `clear` or `alert`. An alert inherited from a consumed input lot also shows `alert`. |
+| Packing expiry | Set by the `pack` event. A `relabel` does not replace it. |
 | Quantity band | A bucket from the commodity profile, not the gram value. The cashew profile uses under 1 t, 1–5 t, 5–20 t, and 20 t and over. |
 
 The buyer and the public page receive the band. The coop, the plant, and an opened audit receive grams.
 
-### Checks that open an alert
+### Rejected writes and opened alerts
 
-The event is still stored. The claim status becomes `alert`.
+Two different outcomes, and the docs used to confuse them. A write is rejected when what it claims is impossible, because there is nothing true to record. A write is stored with an alert when what it claims is merely implausible, because the record is the signal. The design law is "Implausible before criminal", not "implausible is refused".
+
+Rejected. Nothing is stored.
+
+| Check | Rule |
+| --- | --- |
+| Over-emission | Outputs plus declared loss exceed the input. More came out than went in, which is not a thing that happened. |
+| Origin write | Any attempt to update `biological_origin_country` fails the transaction. |
+| Wrong custodian | The signing organization is not the current holder. |
+| Double pack | A second `pack` on a lot that already has a packing expiry. |
+
+Stored, and the claim status becomes `alert`.
 
 | Check | Rule |
 | --- | --- |
 | Yield ceiling | Sum of harvests for that parcel and season is greater than the ceiling. |
-| Merge balance | Output grams differ from the sum of input grams. |
-| Process balance | Outputs plus declared loss differ from the input. Additives are inputs. |
+| Merge shortfall | Output grams fall short of the sum of input grams by more than the profile tolerance. |
+| Process shortfall | Outputs plus declared loss fall short of the input by more than the profile tolerance. Additives are inputs. |
+| Unaccepted transfer | A `transfer` with no matching `accept` after the window the profile sets. |
 | Relabel | The new expiry is later than the packing expiry, or the public code changes. |
-| Origin write | Any attempt to update `biological_origin_country` fails the transaction. This one does not become an alert, because the write does not land. |
+| Inherited alert | An input lot had an open alert when it was consumed. |
+
+The tolerance is a profile value in grams or basis points, not a constant in the handler. Cashew drying loses weight between the farm gate and the intake scale, and a corridor that weighs wet nuts needs a different number than one that weighs dry.
+
+### Alerts survive a merge
+
+An alert is opened on a lot. A merge consumes that lot and creates a new one, so without a rule the status does not follow the goods: a clean output lot would carry no sign of an over-ceiling harvest, and because an audit may only be opened on an alerted lot, the trail would close at the same moment. Laundering a bad harvest would be one merge.
+
+- The output of a `merge` or a `process` inherits an open alert from any input lot, stored as its own alert row referencing the source lot and the source alert.
+- An audit may be opened on a lot that has an alert of its own, or that is an ancestor or a descendant of an alerted lot. The lineage is walked through `consume` events.
+- Closing the source alert does not rewrite the inherited row. It records the resolution beside it.
 
 ## Technical architecture
 
@@ -153,22 +197,36 @@ There is no worker, cache, or object store in the MVP. Document files stay with 
 | Schema and queries | SQL migrations. Drizzle for queries. |
 | Validation | Zod, one schema per event type |
 | Auth | Auth.js session cookies for staff. Organization and role live in `memberships`, not in the auth provider. |
-| Signatures | Ed25519 in the browser via WebCrypto. Server stores the public key only. |
-| Hash | SHA-256 over the canonical JSON event |
+| Signatures | Ed25519 in the browser via WebCrypto. Server stores public keys only, one row per key version. |
+| Canonical form | RFC 8785 (JSON Canonicalization Scheme) |
+| Hash | SHA-256 over the canonical bytes |
 | Hosting | One region, one service, managed Postgres, daily backups |
 
 The private key is generated in the browser when an organization enrolls. It is encrypted with a passphrase the organization keeps. The server may store the ciphertext so a new clerk machine can download it. The server cannot decrypt it. Signing happens in the browser after the passphrase is entered.
 
+### Key versions
+
+One key per organization with no version is a trap. Clerks share the passphrase, so a clerk who leaves still holds it, and the only remedy is a new key. If events do not say which key signed them, replacing the key makes every past signature unverifiable, and the custody property this MVP owes is gone.
+
+- `org_keys` holds one row per key version: organization, public key, `created_at`, `revoked_at`, and the reason.
+- Every event stores `key_id`. Verification uses the key named by the event, not the organization’s current key.
+- A revoked key still verifies events it signed before `revoked_at`. It cannot sign new ones.
+- Rotation is enrollment again: the browser generates the next version, the operator records it, and the old row gets a `revoked_at`.
+- An event whose `observed_at` falls after its key’s `revoked_at` is rejected.
+
+Nothing here needs a new event type. Rotation is rows in `org_keys`, which is why it belongs in the MVP even though no pilot organization will rotate during it.
+
 ### Write path
 
-![Session, event, signature, checks, store, and reply](diagrams/write-path.png)
+![Session, event, signature, verification, refusal, store, and reply](diagrams/write-path.png)
 
-1. The clerk’s session is a member of the organization, and the role may write that event type.
-2. The browser builds the canonical event using the lot’s current `head` hash.
-3. The browser signs `payload_hash` and posts the event.
-4. The API checks the session, the signature, the payload schema, and the head.
-5. One database transaction inserts the event, moves the head, writes any `consume` events, rebuilds the claim, and inserts alerts.
-6. The response is the new head and the claim status.
+1. The clerk’s session is a member of the organization, the organization holds the capability for that event type, and it is the lot’s current holder.
+2. The browser builds the canonical event using the lot’s current `head` hash, its own `key_id`, and `observed_at`.
+3. The browser signs `event_hash` and posts the event.
+4. The API checks the session, the capability, the holder, the signature against that `key_id`, the payload schema, and the head.
+5. The API runs the rejecting checks. A failure here returns an error and stores nothing.
+6. One database transaction inserts the event, moves the head, writes any `consume` events, moves `holder_org_id` on an `accept`, rebuilds the claim against the lot’s `profile_version`, and inserts alerts, including any inherited from a consumed input.
+7. The response is the new head and the claim status.
 
 Two clerks racing on the same lot: the second insert fails the unique constraint on `(lot_id, prev_hash)`. The client reloads the head and asks the clerk to submit again.
 
@@ -178,8 +236,10 @@ Two clerks racing on the same lot: the second insert fails the unique constraint
 | --- | --- | --- |
 | `GET /api/v1/claims/:code` | Public | Claim projection and quantity band. |
 | `GET /api/v1/lots/:id` | Holder organization | Lots they signed or currently hold, with gram weights. |
-| `GET /api/v1/authority/retention` | Origin authority for that country | Weight leaving, and the share of process events in that country. |
-| `GET /api/v1/lots/:id/audit` | Auditor, and only when the lot has an open alert | Full events, facility ids, gram weights, document hashes. |
+| `GET /api/v1/lots/:id/claim` | Buyer the lot was transferred to | The claim, the band, and the last inspection with its report hash. |
+| `GET /api/v1/transfers/incoming` | Receiving organization | Transfers awaiting an `accept`. |
+| `GET /api/v1/authority/retention?country=&season=` | Origin authority for that country | Weight leaving, and the share of process events in that country. Aggregates only, never a lot row. |
+| `GET /api/v1/lots/:id/audit` | Auditor, when the lot has an open alert or is in the lineage of an alerted lot | Full events, facility ids, gram weights, document hashes. |
 
 The audit read is written to an `audit_opens` row: who, when, and which lot.
 
@@ -188,22 +248,30 @@ The audit read is written to an `audit_opens` row: who, when, and which lot.
 - The application role may `INSERT` into `events` and may not `UPDATE` or `DELETE` them.
 - A trigger rejects updates to `lots.biological_origin_country`.
 - `events.id` is unique.
-- `(lot_id, prev_hash)` is unique. `prev_hash` null is allowed once per lot.
+- `(lot_id, prev_hash)` is unique, which serializes two clerks racing on the same head.
+- A partial unique index on `lot_id` where `prev_hash is null` allows exactly one first event per lot. A plain composite unique does not do this, because Postgres treats each null as distinct and would let a lot have many first events.
+- A trigger rejects updates to `lots.profile_version`.
 - `claims` is updated only by the transaction that inserted the event.
 
 ### Authorization
 
-| Role | Harvest and merge | Process | Read grams | Read claim | Open audit |
-| --- | --- | --- | --- | --- | --- |
-| Coop clerk | Own lots | No | Own lots | Yes | No |
-| Plant clerk | No | Lots the plant holds | Those lots | Yes | No |
-| Buyer | No | No | No | Yes, plus last inspection | No |
-| Origin authority | No | No | Country aggregates only | Yes | No |
-| Auditor | No | No | Alerted lots | Yes | Yes |
+| Role | Harvest and merge | Process and pack | Transfer and accept | Read grams | Read claim | Open audit |
+| --- | --- | --- | --- | --- | --- | --- |
+| Coop clerk | Own lots | No | Both, on lots it holds | Own lots | Yes | No |
+| Plant clerk | No | Lots the plant holds | Both, on lots it holds | Those lots | Yes | No |
+| Buyer | No | No | Accept only | No | Lots transferred to it, plus last inspection | No |
+| Origin authority | No | No | No | Country aggregates only | No | No |
+| Auditor | No | No | No | Lots in an alerted lineage | Yes | Yes |
 
-A clerk can sign only with the key of their own organization, and only for a lot that organization currently holds. Harvest is the exception: it creates the lot.
+A clerk can sign only with a key of their own organization, and only for a lot that organization currently holds. Two events are exceptions: `harvest` creates the lot, and `accept` is by definition signed by an organization that does not hold the lot yet.
 
-That table is the cashew seed, not the authorization model. A profile grants capabilities (`write:harvest`, `write:process`, `read:grams`, `open:audit`) to an organization kind. The API checks the capability. A lab or a port agent is a new grant, not a new column.
+The origin authority reads aggregates and nothing else. It has no claim column above, because a claim is about one lot and this reader is never given one.
+
+That table is the cashew seed, not the authorization model. A profile grants capabilities to an organization kind, and the API asks whether the organization holds the capability:
+
+`write:harvest`, `write:merge`, `write:transfer`, `write:accept`, `write:load`, `write:process`, `write:pack`, `write:inspect`, `write:relabel`, `read:grams`, `read:claim`, `read:aggregates`, `open:audit`.
+
+`consume` has no capability. It is written by the server inside the merge and process transactions and is never accepted from a client. A lab or a port agent is a new grant, not a new column.
 
 ## Kernel and configuration
 
@@ -226,6 +294,9 @@ Exit checks:
 - `biological_origin_country` cannot be updated.
 - The grower has no user account.
 - The harvest path reads the cashew profile from configuration. It does not hard-code the commodity or the origin country.
+- The harvest handler does not contain the strings `cashew` or `Côte d'Ivoire`.
+- An enrolling organization cannot set its own kind. The kind is recorded by the operator, and an organization awaiting approval can sign nothing. Self-declaring as an origin authority or an auditor would otherwise be a read-privilege escalation.
+- Two events signed by two key versions of the same organization both verify.
 
 ### Phase 2 — Named merges
 
@@ -235,29 +306,36 @@ Exit checks:
 
 - Every input lot has a `consume` event pointing at the output.
 - A consumed lot cannot be merged again.
-- Output grams must equal the sum of inputs, or an alert opens.
+- Output grams above the sum of inputs is rejected. A shortfall beyond the profile tolerance is stored with an alert.
+- The merge payload holds the head hash of every input lot, and an auditor can verify the lineage from the hashes alone.
 - The output lot’s biological origin is copied from the inputs.
+- An over-ceiling harvest lot merged into a clean lot leaves the output claim at `alert`, naming the source lot.
 - The cashew profile rejects a mixed-origin merge. The test fixture uses Côte d'Ivoire. The merge code does not.
 
-### Phase 3 — Load and process
+### Phase 3 — Handoff, load, and process
 
-Record the lot leaving the country and the plant turning raw nuts into outputs plus a declared loss.
+Move custody to the plant with two signatures, record the lot leaving the country, and record the plant turning raw nuts into outputs plus a declared loss.
 
 Exit checks:
 
+- A `transfer` does not move custody. The coop is still the holder until the plant signs the `accept`.
+- Only the named receiving organization can accept. Another organization’s accept is rejected.
+- A `transfer` left unaccepted past the profile window opens an alert, and the lot is still held by the sender.
 - The process country is stored beside biological origin. The pilot plant is abroad. A profile may process at home.
-- Outputs plus loss must equal the input, or an alert opens.
-- The plant cannot process a lot it does not hold.
+- Outputs plus loss above the input is rejected. A shortfall beyond the profile tolerance is stored with an alert.
+- The plant cannot process a lot it does not hold, and could not hold it without an `accept`.
 
-### Phase 4 — Claim
+### Phase 4 — Pack and claim
 
-Publish the derived claim, including the public code a bag can carry.
+Set the packing expiry, mint the public code, and publish the derived claim.
 
 Exit checks:
 
-- The public route returns origin, process countries, status, and a quantity band.
+- `pack` sets the packing expiry and the public code. A second `pack` on the same lot is rejected.
+- The public route returns commodity, origin, process countries, status, packing expiry, and a quantity band.
 - The public route does not return grams, parcel coordinates, grower name, or document hashes.
 - A relabel with a later expiry leaves the packing expiry on the claim and opens an alert.
+- Editing a band in configuration does not change the claim of a lot already packed, because the claim is rebuilt against the lot’s `profile_version`.
 
 ### Phase 5 — Authority and audit
 
@@ -265,9 +343,10 @@ This is the end of the MVP.
 
 Exit checks:
 
-- The origin-authority page shows weight leaving Côte d'Ivoire and the share of process events that happened there.
-- An auditor can open a lot only when it has an alert, and the open is logged.
-- A buyer sees the claim, the last inspection result, and the band.
+- The origin-authority page shows weight leaving Côte d'Ivoire and the share of process events that happened there, as aggregates. No lot row and no single-lot weight appears on it.
+- An auditor can open a lot only when it has an alert or sits in the lineage of an alerted lot, and the open is logged.
+- An auditor can walk from an alerted harvest lot to the packed lot it ended up in.
+- A buyer sees the claim, the last inspection result with its report hash, and the band, and only for lots transferred to that buyer.
 
 ### After the MVP
 

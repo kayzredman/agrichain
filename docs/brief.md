@@ -29,8 +29,8 @@ The ledger cannot hold the crime. Over-the-counter commodity trades, fake shippi
 
 ## How a lot moves
 
-The coop clerk signs the lot until it leaves the country. The plant clerk signs the processing. The claim is derived from those events.
+The coop clerk signs the lot until it leaves the country. Every change of hands takes two signatures: the side letting go, and the side taking it. The plant clerk signs the processing. The claim is derived from those events.
 
-![Parcel, harvest, merge, load, process, and claim, with the person who signs each step](diagrams/lot-flow.png)
+![Parcel, harvest, merge, transfer, load, accept, process, pack, and claim, with the person who signs each step](diagrams/lot-flow.png)
 
 Who can see that lot, and how little the public page shows, is drawn in the [blueprint](blueprint.md#path-of-a-lot).
