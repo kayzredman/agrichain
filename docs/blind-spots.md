@@ -1,10 +1,8 @@
 # Blind spots
 
-The honest path of a lot:
+The honest path of a lot runs from the parcel to the sale. The gaps sit on the steps after the farm.
 
-`Grow → Gather → Make → Move → Claim → Sell`
-
-Parcel and season, then many farms into one lot, then process and bag, then ship and port, then origin, grade, and date, then the over-the-counter trade and retail.
+![Grow, gather, make, move, claim, and sell, with the gap on each step](diagrams/blind-spots.png)
 
 Each gap below is one she described. The third column is the record agriChain has to keep if that gap is to become visible.
 

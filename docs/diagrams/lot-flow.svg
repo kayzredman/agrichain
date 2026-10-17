@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="616" viewBox="0 0 720 616" role="img">
+  <style>
+    .title { font: 600 15px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .sub { font: 400 12px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .chip { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #2D6A4F; }
+    .head { font: 600 13px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .small { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #1F2937; }
+    .muted { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .on { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .later { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+  </style>
+  <rect width="720" height="616" fill="#ffffff"/>
+  <rect x="80" y="16" width="560" height="74" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="96" y="36">Coop clerk</text>
+  <text class="title" x="96" y="56">Parcel</text>
+  <text class="sub" x="96" y="74">Registers the season ceiling. The grower is a record, not a login.</text>
+  <line x1="360" y1="90" x2="360" y2="112" stroke="#143228" stroke-width="1.25"/><polygon points="356,112 364,112 360,118" fill="#143228"/>
+  <rect x="80" y="118" width="560" height="74" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="96" y="138">Coop clerk</text>
+  <text class="title" x="96" y="158">Harvest</text>
+  <text class="sub" x="96" y="176">Signs the event. The lot opens and biological origin is fixed.</text>
+  <line x1="360" y1="192" x2="360" y2="214" stroke="#143228" stroke-width="1.25"/><polygon points="356,214 364,214 360,220" fill="#143228"/>
+  <rect x="80" y="220" width="560" height="74" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="96" y="240">Coop clerk</text>
+  <text class="title" x="96" y="260">Merge</text>
+  <text class="sub" x="96" y="278">Signs the event. Several harvests become one lot. Inputs stay attached.</text>
+  <line x1="360" y1="294" x2="360" y2="316" stroke="#143228" stroke-width="1.25"/><polygon points="356,316 364,316 360,322" fill="#143228"/>
+  <rect x="80" y="322" width="560" height="74" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="96" y="342">Coop clerk</text>
+  <text class="title" x="96" y="362">Load</text>
+  <text class="sub" x="96" y="380">Signs the event. The lot leaves the origin country.</text>
+  <line x1="360" y1="396" x2="360" y2="418" stroke="#143228" stroke-width="1.25"/><polygon points="356,418 364,418 360,424" fill="#143228"/>
+  <rect x="80" y="424" width="560" height="74" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="96" y="444">Plant clerk</text>
+  <text class="title" x="96" y="464">Process</text>
+  <text class="sub" x="96" y="482">Signs the event. Outputs, declared loss, and the process country.</text>
+  <line x1="360" y1="498" x2="360" y2="520" stroke="#143228" stroke-width="1.25"/><polygon points="356,520 364,520 360,526" fill="#143228"/>
+  <rect x="80" y="526" width="560" height="74" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="96" y="546">Derived</text>
+  <text class="title" x="96" y="566">Claim</text>
+  <text class="sub" x="96" y="584">Built from the events. No one edits it. Origin is not replaced.</text>
+</svg>

@@ -30,6 +30,8 @@ The kernel is the same for every concern.
 
 Each later concern is a module. A module may add an event type, a named check, a claim field, and a read projection. It does not add a second lot table.
 
+![Kernel, and the modules that are on for cashew or left for later](diagrams/modules.png)
+
 | Module | On for cashew | Adds |
 | --- | --- | --- |
 | Custody | Yes | `harvest`, `merge`, `consume`, `load`, `process`, `relabel` |

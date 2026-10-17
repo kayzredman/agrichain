@@ -16,4 +16,6 @@ Figures cited from the episode are what the guest stated. They are not a separat
 | [git-plan.md](git-plan.md) | Branch flow: local dev, remote dev after QA, then main |
 | [qa-modularity.md](qa-modularity.md) | QA: kernel versus commodity configuration |
 
+Drawings live in [diagrams/](diagrams) and are included in the docs above: the lot path, who can see a lot, the service architecture, the write path, the modules, the blind spots, and the git promotion.
+
 Source: [Food and the Fight for Global Security](https://www.youtube.com/watch?v=P-qcYDpPTB4). Guest: Genevieve Leveille, CEO of AgriLedger. Host: Siren, Galway.

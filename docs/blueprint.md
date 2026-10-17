@@ -36,16 +36,13 @@ A broker is an organization that can enroll and sign events it witnessed. The MV
 
 ### Path of a lot
 
-```text
-Parcel in Côte d'Ivoire
-  → harvest, signed by the coop
-  → merge of many harvests into one intake lot
-  → load leaving the country
-  → process at a plant in another country
-  → claim a buyer and the public can read
-```
+The coop clerk signs until the lot leaves the country. The plant clerk signs the processing. The claim is calculated. Biological origin stays the country of harvest. The plant’s country is added beside it.
 
-Biological origin is Côte d'Ivoire from the harvest onward. The plant’s country is added as the place that processed the lot. The claim shows both. Processing never replaces origin.
+![Parcel, harvest, merge, load, process, and claim, with the person who signs each step](diagrams/lot-flow.png)
+
+The same lot is narrower for a stranger than it is for the coop.
+
+![The same lot, read by the public, the buyer, the holders, the origin authority, and an auditor](diagrams/views.png)
 
 ### What the pilot has to prove
 
@@ -141,19 +138,7 @@ The event is still stored. The claim status becomes `alert`.
 
 One web service and one Postgres database. The browser signs. The API checks and stores. Views are queries.
 
-```text
-Browser (coop, plant, buyer, authority, public claim)
-        |  session cookie for staff
-        |  Ed25519 signature on each event
-        v
-Next.js service
-  UI routes
-  HTTP API  /api/v1/...
-        |
-        v
-Postgres
-  actors, places, lots, events, claims, alerts
-```
+![Browser, API, kernel tables, and configuration](diagrams/architecture.png)
 
 There is no worker, cache, or object store in the MVP. Document files stay with the party who holds them. The event stores the SHA-256 of the file.
 
@@ -175,6 +160,8 @@ There is no worker, cache, or object store in the MVP. Document files stay with 
 The private key is generated in the browser when an organization enrolls. It is encrypted with a passphrase the organization keeps. The server may store the ciphertext so a new clerk machine can download it. The server cannot decrypt it. Signing happens in the browser after the passphrase is entered.
 
 ### Write path
+
+![Session, event, signature, checks, store, and reply](diagrams/write-path.png)
 
 1. The clerk’s session is a member of the organization, and the role may write that event type.
 2. The browser builds the canonical event using the lot’s current `head` hash.
@@ -221,6 +208,8 @@ That table is the cashew seed, not the authorization model. A profile grants cap
 ## Kernel and configuration
 
 Lots, events, and claims stay generic. Cashew settings live in seed data: profile, corridor, bands, merge policy, claim fields, enabled checks, and capability grants. The harvest handler does not contain a commodity name or an origin country. A later concern adds a module and rows, as set out in [qa-modularity.md](qa-modularity.md).
+
+![Kernel, and the modules that are on for cashew or left for later](diagrams/modules.png)
 
 ## MVP roadmap
 

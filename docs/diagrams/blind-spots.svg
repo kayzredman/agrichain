@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="158" viewBox="0 0 920 158" role="img">
+  <style>
+    .title { font: 600 15px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .sub { font: 400 12px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .chip { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #2D6A4F; }
+    .head { font: 600 13px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .small { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #1F2937; }
+    .muted { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .on { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .later { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+  </style>
+  <rect width="920" height="158" fill="#ffffff"/>
+  <rect x="10" y="28" width="140" height="110" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="22" y="52">Grow</text>
+  <text class="sub" x="22" y="74">Parcel and season</text>
+  <line x1="150" y1="83.0" x2="156" y2="83.0" stroke="#143228" stroke-width="1.25"/><polygon points="156,79.0 156,87.0 162,83.0" fill="#143228"/>
+  <rect x="162" y="28" width="140" height="110" rx="8" fill="#FFFFFF" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="174" y="52">Gather</text>
+  <text class="sub" x="174" y="74">Aggregation. Hands</text>
+  <text class="sub" x="174" y="90">between farms go</text>
+  <text class="sub" x="174" y="106">unnamed.</text>
+  <line x1="302" y1="83.0" x2="308" y2="83.0" stroke="#143228" stroke-width="1.25"/><polygon points="308,79.0 308,87.0 314,83.0" fill="#143228"/>
+  <rect x="314" y="28" width="140" height="110" rx="8" fill="#FFFFFF" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="326" y="52">Make</text>
+  <text class="sub" x="326" y="74">Factory balance and</text>
+  <text class="sub" x="326" y="90">legal origin.</text>
+  <line x1="454" y1="83.0" x2="460" y2="83.0" stroke="#143228" stroke-width="1.25"/><polygon points="460,79.0 460,87.0 466,83.0" fill="#143228"/>
+  <rect x="466" y="28" width="140" height="110" rx="8" fill="#FFFFFF" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="478" y="52">Move</text>
+  <text class="sub" x="478" y="74">The ship, the ports,</text>
+  <text class="sub" x="478" y="90">the papers.</text>
+  <line x1="606" y1="83.0" x2="612" y2="83.0" stroke="#143228" stroke-width="1.25"/><polygon points="612,79.0 612,87.0 618,83.0" fill="#143228"/>
+  <rect x="618" y="28" width="140" height="110" rx="8" fill="#FFFFFF" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="630" y="52">Claim</text>
+  <text class="sub" x="630" y="74">Expiry and the QR</text>
+  <text class="sub" x="630" y="90">code.</text>
+  <line x1="758" y1="83.0" x2="764" y2="83.0" stroke="#143228" stroke-width="1.25"/><polygon points="764,79.0 764,87.0 770,83.0" fill="#143228"/>
+  <rect x="770" y="28" width="140" height="110" rx="8" fill="#FFFFFF" stroke="#143228" stroke-width="1.25"/>
+  <text class="title" x="782" y="52">Sell</text>
+  <text class="sub" x="782" y="74">OTC trade and shell</text>
+  <text class="sub" x="782" y="90">companies.</text>
+</svg>

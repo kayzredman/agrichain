@@ -1,6 +1,6 @@
 # Field notes
 
-Grouped from the conversation with Genevieve Leveille. These are the points she was making, not a transcript.
+Grouped from the conversation with Genevieve Leveille. These are the points she was making, not a transcript. The path they describe is drawn in the [blueprint](blueprint.md#path-of-a-lot).
 
 ## Fraud is a cartel business
 

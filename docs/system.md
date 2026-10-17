@@ -39,6 +39,10 @@ A commodity profile and a corridor are configuration in Postgres. The profile li
 
 A later concern (honey, fish, fertilizer, a vessel call, an investigation export) is a module plus rows in that configuration. The module may add an event type, a named check, a claim field, or a read projection. It does not add another lot table. The QA of this split is in [qa-modularity.md](qa-modularity.md).
 
+![Browser, API, kernel tables, and configuration](diagrams/architecture.png)
+
+![The same lot, read by the public, the buyer, the holders, the origin authority, and an auditor](diagrams/views.png)
+
 ## First corridor
 
 Cashew, Côte d'Ivoire to a processor country to a European buyer. It forces aggregation of many small growers, a process step that today steals the origin story, and a value-retention number a government can read. Those facts are seed data for the `cashew` profile and one corridor.

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="134" viewBox="0 0 920 134" role="img">
+  <style>
+    .title { font: 600 15px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .sub { font: 400 12px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .chip { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #2D6A4F; }
+    .head { font: 600 13px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .small { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #1F2937; }
+    .muted { font: 400 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+    .on { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #143228; }
+    .later { font: 600 11px Calibri, Segoe UI, sans-serif; fill: #52636B; }
+  </style>
+  <rect width="920" height="134" fill="#ffffff"/>
+  <rect x="19" y="28" width="132" height="86" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="31" y="50">1</text>
+  <text class="title" x="31" y="72">Session</text>
+  <text class="sub" x="31" y="92">Role may write</text>
+  <line x1="151" y1="71.0" x2="163" y2="71.0" stroke="#143228" stroke-width="1.25"/><polygon points="163,67.0 163,75.0 169,71.0" fill="#143228"/>
+  <rect x="169" y="28" width="132" height="86" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="181" y="50">2</text>
+  <text class="title" x="181" y="72">Event</text>
+  <text class="sub" x="181" y="92">Canonical JSON</text>
+  <line x1="301" y1="71.0" x2="313" y2="71.0" stroke="#143228" stroke-width="1.25"/><polygon points="313,67.0 313,75.0 319,71.0" fill="#143228"/>
+  <rect x="319" y="28" width="132" height="86" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="331" y="50">3</text>
+  <text class="title" x="331" y="72">Sign</text>
+  <text class="sub" x="331" y="92">Ed25519 in browser</text>
+  <line x1="451" y1="71.0" x2="463" y2="71.0" stroke="#143228" stroke-width="1.25"/><polygon points="463,67.0 463,75.0 469,71.0" fill="#143228"/>
+  <rect x="469" y="28" width="132" height="86" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="481" y="50">4</text>
+  <text class="title" x="481" y="72">Checks</text>
+  <text class="sub" x="481" y="92">Key, schema, head</text>
+  <line x1="601" y1="71.0" x2="613" y2="71.0" stroke="#143228" stroke-width="1.25"/><polygon points="613,67.0 613,75.0 619,71.0" fill="#143228"/>
+  <rect x="619" y="28" width="132" height="86" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="631" y="50">5</text>
+  <text class="title" x="631" y="72">Store</text>
+  <text class="sub" x="631" y="92">Event, claim, alerts</text>
+  <line x1="751" y1="71.0" x2="763" y2="71.0" stroke="#143228" stroke-width="1.25"/><polygon points="763,67.0 763,75.0 769,71.0" fill="#143228"/>
+  <rect x="769" y="28" width="132" height="86" rx="8" fill="#F4F7F5" stroke="#143228" stroke-width="1.25"/>
+  <text class="chip" x="781" y="50">6</text>
+  <text class="title" x="781" y="72">Reply</text>
+  <text class="sub" x="781" y="92">New head and status</text>
+</svg>

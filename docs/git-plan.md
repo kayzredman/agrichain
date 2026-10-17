@@ -17,6 +17,8 @@ Promote the QA'd commit in this order.
 3. Fast-forward local `main` to match `origin/main`.
 4. Check out `dev` again before the next change.
 
+![Local dev, then origin/dev, then origin/main, then local main](diagrams/git-flow.png)
+
 ```bash
 git push origin dev
 git push origin dev:main

@@ -1,6 +1,6 @@
 # Design laws
 
-These are the constraints. A feature that breaks one of them repeats a failure already described on the episode.
+These are the constraints. A feature that breaks one of them repeats a failure already described on the episode. Where a law lands on a lot is drawn in the [blueprint](blueprint.md#path-of-a-lot).
 
 | Law | From the episode | What agriChain does |
 | --- | --- | --- |
