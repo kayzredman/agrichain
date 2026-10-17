@@ -1,0 +1,12 @@
+---
+description: Keep agriChain design and project docs in the workspace docs folder
+alwaysApply: true
+---
+
+# Docs live in the workspace
+
+Write design notes, decisions, and project documents under `docs/` in this repository. Update `docs/README.md` when a new doc is added.
+
+The source of truth is those files. A chat canvas may illustrate them. It does not replace them.
+
+Read `docs/design-laws.md` before changing the product. A feature that breaks a law there needs an explicit decision recorded in `docs/`.
