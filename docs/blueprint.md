@@ -138,7 +138,7 @@ A claim is derived. Users do not edit it.
 | Commodity | Copied from the harvest. |
 | Biological origin | Copied from the harvest. No later event writes this field. |
 | Process countries | Appended by each `process` event, in order. |
-| Status | `clear` or `alert`. An alert inherited from a consumed input lot also shows `alert`. |
+| Status | `clear`, `awaiting countersign`, or `alert`. An alert inherited from a consumed input lot also shows `alert`. The three come from the dispositions in [flow-control.md](flow-control.md). |
 | Packing expiry | Set by the `pack` event. A `relabel` does not replace it. |
 | Quantity band | A bucket from the commodity profile, not the gram value. The cashew profile uses under 1 t, 1–5 t, 5–20 t, and 20 t and over. |
 
@@ -177,6 +177,20 @@ An alert is opened on a lot. A merge consumes that lot and creates a new one, so
 - The output of a `merge` or a `process` inherits an open alert from any input lot, stored as its own alert row referencing the source lot and the source alert.
 - An audit may be opened on a lot that has an alert of its own, or that is an ancestor or a descendant of an alerted lot. The lineage is walked through `consume` events.
 - Closing the source alert does not rewrite the inherited row. It records the resolution beside it.
+
+### After the checks
+
+Three dispositions, chosen per event type by the profile rather than by the handler. The rule behind them is that the event is never gated, only the claim. A signed event waiting in an approval queue is a true thing the record does not say, which is the opacity this system exists to remove. The reasoning is in [flow-control.md](flow-control.md).
+
+| Disposition | Claim reads | Next step |
+| --- | --- | --- |
+| Auto-advance | `clear` | Unlocked. No human in the way. The cashew pilot runs this way for every event type. |
+| Alert | `alert` | Still unlocked. Holding goods that rot makes recording them a liability, so the alert travels with the lot instead. |
+| Countersign required | `awaiting countersign` | Unlocked, but no reader sees `clear` until the second party signs. |
+
+Countersign is an option for a high-value step, not the backbone, because `transfer` and `accept` already put two signatures on every handoff and they sit in organizations with opposing interests. A coop supervisor checking a coop clerk is a weaker control than the plant that has to pay for the weight and balance it against what it cracks.
+
+An alert is resolved by a signed record placed beside it, never by an edit. `resolve:alert` is granted to the origin authority and the auditor, not to the organization whose event raised the alert, so nobody clears their own alarm.
 
 ## Technical architecture
 
@@ -291,7 +305,7 @@ The origin authority reads aggregates and nothing else. It has no claim column a
 
 That table is the cashew seed, not the authorization model. A profile grants capabilities to an organization kind, and the API asks whether the organization holds the capability:
 
-`write:harvest`, `write:merge`, `write:transfer`, `write:accept`, `write:load`, `write:process`, `write:pack`, `write:inspect`, `write:relabel`, `read:grams`, `read:claim`, `read:aggregates`, `open:audit`.
+`write:harvest`, `write:merge`, `write:transfer`, `write:accept`, `write:load`, `write:process`, `write:pack`, `write:inspect`, `write:relabel`, `write:countersign`, `read:grams`, `read:claim`, `read:aggregates`, `open:audit`, `resolve:alert`.
 
 `consume` has no capability. It is written by the server inside the merge and process transactions and is never accepted from a client. A lab or a port agent is a new grant, not a new column.
 
@@ -369,6 +383,9 @@ Exit checks:
 - The origin-authority page shows weight leaving Côte d'Ivoire and the share of process events that happened there, as aggregates. No lot row and no single-lot weight appears on it.
 - An auditor can open a lot only when it has an alert or sits in the lineage of an alerted lot, and the open is logged.
 - An auditor can walk from an alerted harvest lot to the packed lot it ended up in.
+- An auditor resolves an alert. The alert stays visible with a signer, a reason, and a time, and the event that raised it is untouched. The public claim returns to `clear` and says the record was reviewed.
+- The organization whose event raised an alert cannot resolve it.
+- Turning on `countersign_required` for one event type in a test profile puts that lot's claim at `awaiting countersign` and no reader sees `clear`. No migration is needed to do it.
 - A buyer sees the claim, the last inspection result with its report hash, and the band, and only for lots transferred to that buyer.
 
 ### Phase 6 — Proofs

@@ -54,8 +54,8 @@ The tolerance is configuration. Cashew loses weight drying between the farm gate
 - Two invariants described modules that are off for cashew, the fertilizer ceiling and the port-skip alert. They are marked as product rules, not MVP behaviour.
 - An enrolling organization could set its own kind. Self-declaring as an origin authority or an auditor is a read-privilege escalation, so the kind is recorded by the operator and an unapproved organization can sign nothing.
 
-## Still open
+## Closed since
 
-- The diagrams in [diagrams/](diagrams) predate this round. The lot flow and the write path need the transfer and accept steps.
-- The mockups show a per-lot weight on the origin-authority screen, which that reader may not see, and have no accept screen.
-- Alert resolution is named but not designed. An alert can be opened and inherited; nothing says who closes one, or what a closed alert does to a published claim. It is not needed before Phase 4.
+- The diagrams in [diagrams/](diagrams) have been regenerated with the transfer and accept steps, and the transparency log has one of its own.
+- The origin-authority screen now shows season aggregates by processing country instead of a per-lot weight, and the mockups have an accept screen.
+- Alert resolution is designed in [flow-control.md](flow-control.md). A resolution is signed beside the alert by a party that did not raise it, the event it refers to is untouched, and a resolved alert still shows on the lot and in the lineage of everything the lot became.

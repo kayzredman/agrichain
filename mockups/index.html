@@ -8,18 +8,116 @@
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <p class="brand">agri<span>Chain</span></p>
+    <span class="env">Cashew pilot</span>
+    <div class="topbar-right">
+      <p class="ledger-state" id="ledger-state">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Record checked<span class="long">, nothing changed</span></span>
+      </p>
+      <p class="whoami">
+        <b>Coopérative de Bondoukou</b>
+        <span>Coop · Côte d’Ivoire · key v1</span>
+      </p>
+    </div>
+  </header>
+
   <div class="app">
-    <aside class="rail">
-      <p class="brand">agriChain</p>
-      <p class="pilot">Cashew pilot mockup</p>
+    <aside class="rail" id="rail"></aside>
+    <div class="workspace">
       <label class="step-label">
         Step
         <select class="step-select" id="step"></select>
       </label>
-      <nav id="nav" aria-label="Lot path"></nav>
-    </aside>
-    <div class="workspace">
       <main id="main" tabindex="-1">
+
+        <section data-screen="dashboard" data-role="Any signed-in clerk" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Today on the corridor</h1>
+              <p class="lede">Every lot that moved since midnight, and where it stopped. The record was checked when you signed in, so this page is read from a log that agrees with yesterday’s.</p>
+            </div>
+            <p class="role">Any signed-in clerk</p>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <p class="kpi-label">Lots in flight</p>
+              <p class="kpi-value" id="kpi-flight">38</p>
+              <p class="kpi-foot">Harvested, not yet packed</p>
+            </div>
+            <div class="kpi">
+              <p class="kpi-label">Waiting to be accepted</p>
+              <p class="kpi-value" id="kpi-waiting">4</p>
+              <p class="kpi-foot">One past its 48&nbsp;hour window</p>
+            </div>
+            <div class="kpi">
+              <p class="kpi-label">Open alerts</p>
+              <p class="kpi-value is-alert" id="kpi-alerts">2</p>
+              <p class="kpi-foot">Both inherited from one harvest</p>
+            </div>
+            <div class="kpi">
+              <p class="kpi-label">Awaiting countersign</p>
+              <p class="kpi-value" id="kpi-counter">0</p>
+              <p class="kpi-foot">No event type needs one here</p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>
+              Activity flow
+              <span class="toolbar">
+                <button class="secondary" type="button" id="flow-toggle" aria-pressed="true">Pause</button>
+              </span>
+            </h2>
+            <div class="flow" id="flow" role="img"
+                 aria-label="Nine stages from parcel to claim. Counts update as events are signed. A written list of the same events follows below.">
+            </div>
+            <p class="legend">
+              <span>A dot is one signed event moving to the stage that now holds the lot.</span>
+              <span>Green advanced on its own. Red stopped for a person. Neither one waited to be written down.</span>
+            </p>
+          </div>
+
+          <div class="panel">
+            <h2>Signed in the last hour <span class="toolbar legend-inline">Time · event · lot · detail · signer</span></h2>
+            <ul class="feed" id="feed" aria-live="polite" aria-relevant="additions"></ul>
+            <p class="hint">Nothing here can be edited or removed. A correction is a new event that points at this one.</p>
+          </div>
+
+          <div class="panel">
+            <h2>Needs a person</h2>
+            <table>
+              <caption class="hint" style="caption-side:bottom;text-align:left;padding:8px 16px">An alert never stops the goods. It travels with them.</caption>
+              <thead>
+                <tr><th scope="col">Lot</th><th scope="col">What happened</th><th scope="col">Who can act</th><th scope="col">State</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>H-1182</td>
+                  <td>Harvest of 2,400 kg over the parcel ceiling for the season</td>
+                  <td>Origin authority, auditor</td>
+                  <td><span class="status alert">Alert</span></td>
+                </tr>
+                <tr>
+                  <td>M-0441</td>
+                  <td>Inherited the H-1182 alert through a merge</td>
+                  <td>Resolved at the source</td>
+                  <td><span class="status alert">Alert</span></td>
+                </tr>
+                <tr>
+                  <td>M-214</td>
+                  <td>Transferred to Saigon Kernel Plant 51 hours ago, never accepted</td>
+                  <td>Saigon Kernel Plant</td>
+                  <td><span class="status waiting">Waiting</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <section data-screen="enroll" data-role="Coop clerk">
           <div class="screen-head">
             <div>
@@ -478,6 +576,65 @@
             <p>You would see this instead, naming the event, in these words:</p>
             <p class="note">Harvest H-1041, signed 12 March, no longer matches what this cooperative signed. Nothing on this page has been deleted. Take this to the operator and to the origin authority.</p>
             <p class="hint">The proof itself stays available for an auditor or a government that wants to recompute it. A clerk is never asked to read a hash.</p>
+          </div>
+        </section>
+
+        <section data-screen="countersign" data-role="Origin authority" hidden>
+          <div class="screen-head">
+            <div>
+              <h1>Second signatures</h1>
+              <p class="lede">Nothing on this page is waiting to be written. Every event below is already in the record and cannot be withdrawn. What is waiting is what the record is allowed to claim.</p>
+            </div>
+            <p class="role">Origin authority</p>
+          </div>
+
+          <p class="note">The cashew profile asks for no countersigned event type, so this queue is empty in the pilot. It is shown because turning one on later is a configuration row, not a release.</p>
+
+          <div class="panel">
+            <h2>Resolve an alert</h2>
+            <p>A resolution sits beside the alert. It does not replace it, and it does not touch the event that raised it. The cooperative that signed H-1182 cannot resolve it.</p>
+            <form data-next="dashboard" data-done="Resolution signed. H-1182 and the two lots that inherited it now read clear, and the alert stays on the record with your name on it.">
+              <div class="fields">
+                <label>Lot
+                  <span class="hint">Harvest of 2,400 kg over the parcel ceiling.</span>
+                  <input value="H-1182" readonly>
+                </label>
+                <label>Raised by
+                  <span class="hint">Yield ceiling rule, 14 October 2026.</span>
+                  <input value="Profile rule" readonly>
+                </label>
+                <label>Finding
+                  <select>
+                    <option>Ceiling was wrong, parcel was re-surveyed at 3.1 ha</option>
+                    <option>Harvest was overstated, cooperative has corrected it</option>
+                    <option>Cannot determine, leaving open</option>
+                  </select>
+                </label>
+                <label>Reason shown on the lot
+                  <span class="hint">A reader of the public claim sees that the record was reviewed, never this sentence.</span>
+                  <input value="Parcel re-surveyed; the ceiling it was judged against was stale.">
+                </label>
+              </div>
+              <div class="actions">
+                <button class="primary" type="submit">Sign the resolution</button>
+                <button class="secondary" type="button" data-jump="audit">Open the audit first</button>
+              </div>
+              <p class="note" data-result hidden></p>
+            </form>
+          </div>
+
+          <div class="panel">
+            <h2>What a countersigned step would look like</h2>
+            <table>
+              <thead>
+                <tr><th scope="col">Lot</th><th scope="col">Event</th><th scope="col">Signed</th><th scope="col">Claim reads</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>K-889</td><td>Process</td><td>Saigon Kernel Plant, 08:40</td><td><span class="status waiting">Awaiting countersign</span></td></tr>
+                <tr><td>K-889</td><td>Process</td><td>Origin authority, pending</td><td><span class="status info">Your signature</span></td></tr>
+              </tbody>
+            </table>
+            <p class="hint">The process event is on the record from 08:40. Only the claim waits. No reader is shown a clear claim in the meantime, and the goods are not held.</p>
           </div>
         </section>
       </main>

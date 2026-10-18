@@ -13,6 +13,7 @@ Figures cited from the episode are what the guest stated. They are not a separat
 | [system.md](system.md) | Records, access, invariants, first corridor, build order |
 | [blueprint.md](blueprint.md) | Solution blueprint, technical architecture, and MVP roadmap |
 | [ledger.md](ledger.md) | Decision: what makes this a ledger, and why not a permissioned chain yet |
+| [flow-control.md](flow-control.md) | Decision: auto-advance, alert, or countersign after the checks, and how an alert is resolved |
 | [agriChain Solution Blueprint.docx](agriChain%20Solution%20Blueprint.docx) | The same blueprint as a Word document |
 | [git-plan.md](git-plan.md) | Branch flow: local dev, remote dev after QA, then main |
 | [qa-modularity.md](qa-modularity.md) | QA: kernel versus commodity configuration |
