@@ -45,6 +45,23 @@ That is the property that was missing. No single firm controls the record, becau
 
 What it leaks is volume. Tree size tells a reader how many events exist. That is accepted.
 
+## Trust has to be legible, or it is not trust
+
+The reason this design exists is the trust story, so it is worth being exact about where that story can still fail.
+
+A counter-signed tree head protects the cooperative only if the cooperative checks it. A log nobody audits is a log the operator controls again, this time with extra mathematics. And [field-notes.md](field-notes.md) sets the bar for what checking can look like: "Adoption fails if the system is built for one company or one person who controls many farmers. It has to be open. Farmers and governments can understand it."
+
+A Merkle inclusion proof does not clear that bar. A clerk at a buying point cannot evaluate a hash path, and asking them to is how a system ends up technically verifiable and practically trusted on faith.
+
+So verification is not an expert feature in this design. It is automatic and it is plain.
+
+- The clerk's client fetches the latest head, checks the events that organization signed, and counter-signs the head, on sign-in. No one has to remember to do it.
+- Each organization sees one plain sentence about its own record: how many of its events are covered, when it last counter-signed, and whether anything it signed has changed since. Not a hash path.
+- A failed check is loud and specific. It names the event and says the record no longer matches what this organization signed, in those words.
+- The proof itself stays available underneath, for an auditor or a government that wants to recompute. Legibility is the default view, not the only one.
+
+This is the same discipline as the rest of the product. The public claim page shows a status and not a hash. The yield ceiling shows an alert and not a query plan. Verification gets the same treatment, because a farmer who cannot tell whether the record held does not have a record they control.
+
 ## What is still deferred
 
 A permissioned ledger for the hash chain, when a second operator will not accept this database. That is the condition, and it has not happened. The event JSON and the leaf definition are already ledger-shaped, so the log can move when it does.

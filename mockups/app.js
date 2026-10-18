@@ -12,6 +12,7 @@ const order = [
   ["buyer", "11. Buyer"],
   ["authority", "12. Authority"],
   ["audit", "13. Audit"],
+  ["verify", "14. Verify"],
 ];
 
 const nav = document.getElementById("nav");

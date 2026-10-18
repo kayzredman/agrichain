@@ -384,6 +384,13 @@ Exit checks:
 - A leaf removed or reordered fails the consistency proof.
 - Verification uses only the head, the proof, and the event. It does not re-query the operator for the answer.
 
+Legibility is part of the phase, not a later polish. A proof only a cryptographer can read leaves the operator in control of what the record means.
+
+- The client checks and counter-signs on sign-in. No clerk has to remember to verify.
+- The coop screen states, in one sentence and no hash, how many of its events are covered, when it last counter-signed, and whether anything it signed has changed.
+- A failed check names the event and says the record no longer matches what this organization signed. It does not show a hash path unless asked.
+- The raw proof stays reachable for an auditor or a government that wants to recompute it.
+
 ### After the MVP
 
 In this order, and only when the pilot asks for them:
